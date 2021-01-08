@@ -1,0 +1,8 @@
+Palju olulisi komponente, nagu liha ja kala, hangime siiski Eestist. Loomulikult
+kuuluvad meie kohalikku ostusedelisse ka aedviljad. Meie peremehe Gesualdo Nava
+arvates saab hea roa ka ilma lihata ja nii paluski ta mul edastada sellise
+retsepti: Taglierini või tagliatelle (lintjad spagetid) Sool maitse järgi Must
+pipar maitse järgi Oliivõli 10 g Sibul 40 g Porgand 50 g Kapsas 50 g Tomat 50 g
+Redis 50 g Lehtsalat 10 g Riivitud Parmigiano (Parmesani) juustu 30 g Aedvilju
+võib asendada või välja vahetada vastavalt sellele, mis käesoleval hetkel
+käepärast on.

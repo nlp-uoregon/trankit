@@ -1,0 +1,139 @@
+{
+  'id': 2,
+  'text': 'On\npourra toujours parler à propos d\'Averroès de "décentrement du Sujet".',
+  'dspan': (149,
+  222),
+  'tokens': [
+    {
+      'id': 1,
+      'text': 'On',
+      'dspan': (149,
+      151),
+      'span': (0,
+      2)
+    },
+    {
+      'id': 2,
+      'text': 'pourra',
+      'dspan': (152,
+      158),
+      'span': (3,
+      9)
+    },
+    {
+      'id': 3,
+      'text': 'toujours',
+      'dspan': (159,
+      167),
+      'span': (10,
+      18)
+    },
+    {
+      'id': 4,
+      'text': 'parler',
+      'dspan': (168,
+      174),
+      'span': (19,
+      25)
+    },
+    {
+      'id': 5,
+      'text': 'à',
+      'dspan': (175,
+      176),
+      'span': (26,
+      27)
+    },
+    {
+      'id': 6,
+      'text': 'propos',
+      'dspan': (177,
+      183),
+      'span': (28,
+      34)
+    },
+    {
+      'id': 7,
+      'text': "d'",
+      'dspan': (184,
+      186),
+      'span': (35,
+      37)
+    },
+    {
+      'id': 8,
+      'text': 'Averroès',
+      'dspan': (186,
+      194),
+      'span': (37,
+      45)
+    },
+    {
+      'id': 9,
+      'text': 'de',
+      'dspan': (195,
+      197),
+      'span': (46,
+      48)
+    },
+    {
+      'id': 10,
+      'text': '"',
+      'dspan': (198,
+      199),
+      'span': (49,
+      50)
+    },
+    {
+      'id': 11,
+      'text': 'décentrement',
+      'dspan': (199,
+      211),
+      'span': (50,
+      62)
+    },
+    {
+      'id': (12,
+      13),
+      'text': 'du',
+      'expanded': [
+        {
+          'id': 12,
+          'text': 'de'
+        },
+        {
+          'id': 13,
+          'text': 'le'
+        }
+      ],
+      'span': (63,
+      65),
+      'dspan': (212,
+      214)
+    },
+    {
+      'id': 14,
+      'text': 'Sujet',
+      'dspan': (215,
+      220),
+      'span': (66,
+      71)
+    },
+    {
+      'id': 15,
+      'text': '"',
+      'dspan': (220,
+      221),
+      'span': (71,
+      72)
+    },
+    {
+      'id': 16,
+      'text': '.',
+      'dspan': (221,
+      222),
+      'span': (72,
+      73)
+    }
+  ]
+}

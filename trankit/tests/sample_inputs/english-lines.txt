@@ -1,0 +1,5 @@
+If you plot multiple charts, you will see a drop area for multi-chart fields.
+This type of drop area is not displayed for single charts. Drop areas Moving
+fields to the category and series areas When you move a field to the series
+area, the unique items of data within the field are displayed as data series in
+the chart.

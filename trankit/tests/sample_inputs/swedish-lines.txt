@@ -1,0 +1,5 @@
+Om du gör i ordning flera diagram får du se ett släppområde för
+multidiagramfält. Den typen av släppområde visas inte för enskilda diagram.
+Släppområden Flytta fält till kategori- och serieområden När du flyttar ett fält
+till serieområdet visas de unika dataelementen inom fältet som dataserier i
+diagrammet.
