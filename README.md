@@ -28,7 +28,7 @@ both sentence and document level. Currently, Trankit supports the following task
 - Dependency parsing.
 - Named entity recognition.
 
-Built on the state-of-the-art multilingual pretrained transformer [XLM-Roberta](https://arxiv.org/abs/1911.02116), Trankit significantly *outperforms* prior multilingual NLP pipelines in many tasks over 90 [Universal Dependencies v2.5 treebanks](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105) while still being efficient in memory usage and
+Built on the state-of-the-art multilingual pretrained transformer [XLM-Roberta](https://arxiv.org/abs/1911.02116), Trankit significantly *outperforms* prior multilingual NLP pipelines (e.g., UDPipe, Stanza) in many tasks over 90 [Universal Dependencies v2.5 treebanks](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105) while still being efficient in memory usage and
 speed, making it *usable for general users*. Below is the performance comparison between Trankit and other NLP toolkits on Arabic, Chinese, and English.
 
 <table class="tg">
