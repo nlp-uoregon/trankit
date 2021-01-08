@@ -1,8 +1,8 @@
 <h2 align="center">Trankit: A Light-Weight Transformer-based Python Toolkit for Multilingual Natural Language Processing</h2>
 
 <div align="center">
-    <a href="https://github.com/minhvannguyen/trankit/blob/main/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/minhvannguyen/trankit.svg?color=blue">
+    <a href="https://github.com/nlp-uoregon/trankit/blob/master/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/nlp-uoregon/trankit.svg?color=blue">
     </a>
     <a href='https://trankit.readthedocs.io/en/latest/?badge=latest'>
     <img src='https://readthedocs.org/projects/trankit/badge/?version=latest' alt='Documentation Status' />
@@ -226,7 +226,7 @@ The command would install Trankit and all dependent packages automatically.
 
 #### From source
 ```
-git clone https://github.com/minhvannguyen/trankit.git
+git clone https://github.com/nlp-uoregon/trankit.git
 cd trankit
 pip install -e .
 ```
