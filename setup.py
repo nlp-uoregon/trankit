@@ -32,9 +32,9 @@ setup(
     description="Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/minhvannguyen/trankit",
-    author="Minh Nguyen",
-    author_email="minhnv@cs.uoregon.edu",
+    url="https://github.com/nlp-uoregon/trankit",
+    author="NLP Group at the University of Oregon",
+    author_email="thien@cs.uoregon.edu",
     license='Apache License 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
