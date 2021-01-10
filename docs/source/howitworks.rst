@@ -12,7 +12,7 @@ Natural Language Processing (NLP) pipelines of prior NLP Toolkits such as UDPipe
     :alt: Trankit Architecture
     :align: center
 
-    Overall architecture of Trankit. Among the five models, three (i.e., Token and Sentence Splitter, Joint Model, and Named Entity Recognizer) in Trankit are transformer-based. They all share a single multilingual pretrained transformer.
+    Overall architecture of Trankit. Among the five models, three (i.e., joint token and sentence splitter, joint model, and named entity recognizer) in Trankit are transformer-based. They all share a single multilingual pretrained transformer.
 
 First, we utilize the state-of-the-art multilingual pretrained transformer XLM-Roberta (`Conneau et al., 2020 <https://arxiv.org/abs/1911.02116>`_) to build three components: the joint token and sentence splitter; the joint model for part-of-speech, morphological tagging, and dependency parsing; and the named entity recognizer (See the figure above). As a result, our system advances state-of-theart performance for sentence segmentation, part-of-speech (POS) tagging, morphological feature tagging, and dependency parsing while achieving competitive or better performance for tokenization, multi-word token expansion, and lemmatizatio over the 90 treebanks.
 
