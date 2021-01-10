@@ -1,6 +1,6 @@
 import torch.nn.functional as F
 from .base_models import *
-from .crf_model import CRFLoss, viterbi_decode
+from trankit.layers.crf_layer import CRFLoss, viterbi_decode
 from ..utils.base_utils import *
 from ..utils.conll import *
 
@@ -60,7 +60,7 @@ class NERClassifier(nn.Module):
         return tag_seqs
 
 
-class TaggerClassifier(nn.Module):
+class PosDepClassifier(nn.Module):
     def __init__(self, config, treebank_name):
         super().__init__()
         self.config = config

@@ -72,8 +72,7 @@ class Multilingual_Embedding(Base_Model):
 
 class Deep_Biaffine(nn.Module):
     '''
-    Adapted from https://github.com/stanfordnlp/stanza/blob/master/stanza/models/common/biaffine.py
-    Date: 2021/01/06
+    implemented based on the paper https://arxiv.org/abs/1611.01734
     '''
 
     def __init__(self, in_dim1, in_dim2, hidden_dim, output_dim):

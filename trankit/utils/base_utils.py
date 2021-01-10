@@ -2,8 +2,8 @@ import re
 from tqdm import tqdm
 import requests
 import zipfile
-from .seq2seq_utils import *
-from .seq2seq_vocabs import *
+from trankit.utils.mwt_lemma_utils.seq2seq_utils import *
+from trankit.utils.mwt_lemma_utils.seq2seq_vocabs import *
 import math
 from numbers import Number
 from .chuliu_edmonds import *
@@ -12,10 +12,18 @@ from .tbinfo import *
 from torch.utils.data import DataLoader, Dataset
 import time
 from datetime import datetime
+import shutil
+from .scorers import conll18_ud_eval as ud_eval
 
 SPACE_RE = re.compile(r'\s')
 
-from . import conll18_ud_eval as ud_eval
+
+def remove_with_path(path):
+    if os.path.exists(path):
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
 
 
 def get_ud_score(system_conllu_file, gold_conllu_file):

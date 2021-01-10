@@ -4,11 +4,9 @@ Date: 2021/01/06
 '''
 import sys
 from copy import deepcopy
-from .seq2seq_model import Seq2SeqModel
-from ..utils.seq2seq_utils import *
-from ..utils.seq2seq_vocabs import *
+from trankit.layers.seq2seq import Seq2SeqModel
 from ..iterators.mwt_iterators import MWTDataLoader
-from ..utils.mwt_utils import get_mwt_expansions, set_mwt_expansions
+from trankit.utils.mwt_lemma_utils.mwt_utils import get_mwt_expansions, set_mwt_expansions
 from ..utils.base_utils import *
 
 
@@ -206,11 +204,12 @@ class MWTWrapper:
     def get_mwt_trainer(self, language, use_gpu):
         args = get_args()
         args['mode'] = 'train'
-        args['batch_size'] = 50
+        args['batch_size'] = self.config.batch_size
         args['lang'] = language
         args['shorthand'] = language
         args['cuda'] = use_gpu
         args['model_dir'] = self.config._save_dir
+        args['num_epoch'] = self.config.max_epoch
 
         self.train_file = self.config.train_conllu_fpath
         # pred and gold path
@@ -222,9 +221,6 @@ class MWTWrapper:
             self.in_dev_file = self.config.dev_conllu_fpath
 
         # load data
-        print("Loading data with batch size {}...".format(args['batch_size']))
-        self.config.logger.info("Loading data with batch size {}...".format(args['batch_size']))
-
         self.train_batch = MWTDataLoader(CoNLL.conll2dict(self.train_file), args['batch_size'], args, evaluation=False,
                                          training_mode=True)
         vocab = self.train_batch.vocab
@@ -237,7 +233,7 @@ class MWTWrapper:
 
         # skip training if the language does not have training or dev data
         if len(self.train_batch) == 0 or len(self.dev_batch) == 0:
-            print("Skip training because no data available...")
+            print("No training data available...")
             sys.exit(0)
 
         # train a dictionary-based MWT expander
@@ -245,15 +241,14 @@ class MWTWrapper:
         self.args = args
         self.vocab = self.trainer.vocab
 
-        print('Initiliazed MWT trainer!')
-        self.config.logger.info('Initiliazed MWT trainer!')
+        print('Initiliazed MWT trainer')
+        self.config.logger.info('Initiliazed MWT trainer')
 
     def train(self):
         print("Training dictionary-based MWT expander...")
         self.config.logger.info("Training dictionary-based MWT expander...")
         self.trainer.train_dict(get_mwt_expansions(self.train_batch.doc, evaluation=False, training_mode=True))
-        print("Evaluating on dev set...")
-        self.config.logger.info("Evaluating on dev set...")
+
         dev_preds = self.trainer.predict_dict(
             get_mwt_expansions(self.dev_batch.doc, evaluation=True, training_mode=True))
         doc = deepcopy(self.dev_batch.doc)
@@ -277,8 +272,11 @@ class MWTWrapper:
         best_dev_score = {}
         for epoch in range(1, self.args['num_epoch'] + 1):
             train_loss = 0
+            progress = tqdm(total=len(self.train_batch), ncols=75,
+                            desc='Train {}'.format(epoch))
             for i, batch in enumerate(self.train_batch):
                 start_time = time.time()
+                progress.update(1)
                 global_step += 1
                 loss = self.trainer.update(batch, eval=False)  # update step
                 train_loss += loss
@@ -289,16 +287,12 @@ class MWTWrapper:
                                                               current_lr))
 
             # eval on dev
-            print("Evaluating on dev set...")
-            self.config.logger.info("Evaluating on dev set...")
+            progress.close()
             dev_preds = []
             for i, batch in enumerate(self.dev_batch):
                 preds = self.trainer.predict(batch)
                 dev_preds += preds
-            # if self.args.get('ensemble_dict', False):
-            #     print("[Ensembling dict with seq2seq model...]")
-            #     dev_preds = self.trainer.ensemble(
-            #         get_mwt_expansions(self.dev_batch.doc, evaluation=True, training_mode=True), dev_preds)
+
             doc = deepcopy(self.dev_batch.doc)
             doc = set_mwt_expansions(doc, dev_preds, training_mode=True)
             CoNLL.dict2conll(doc, self.system_pred_file)
@@ -315,14 +309,11 @@ class MWTWrapper:
 
             dev_score_history += [dev_score['Words'].f1]
 
-        print("Training ended with {} epochs.".format(epoch))
-
-        best_f, best_epoch = max(dev_score_history) * 100, np.argmax(dev_score_history) + 1
-        print("Best dev F1 = {:.2f}, at epoch = {}".format(best_f, best_epoch))
+        print("Training done.")
 
         # try ensembling with dict if necessary
         if self.args.get('ensemble_dict', False):
-            print("[Ensembling dict with seq2seq model...]")
+            print("Ensembling dict with seq2seq model")
             dev_preds = self.trainer.ensemble(
                 get_mwt_expansions(self.dev_batch.doc, evaluation=True, training_mode=True), best_dev_preds)
             doc = deepcopy(self.dev_batch.doc)

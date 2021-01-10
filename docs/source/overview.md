@@ -226,4 +226,4 @@ The output is now a dictionary with a list of all tokens, instead of a list of s
 }
 ```
 
-For more examples on other functions, please refer to the following sections: [Sentence Segmentation](ssplit.md), [Tokenization](tokenize.md), [Part-of-speech tagging and Dependency parsing](posdep.md), [Lemmatization](lemmatize.md), [Named entity recognition](ner.md), and [Training your own pipeline](customizedloading.md).
+For more examples on other functions, please refer to the following sections: [Sentence Segmentation](ssplit.md), [Tokenization](tokenize.md), [Part-of-speech tagging and Dependency parsing](posdep.md), [Lemmatization](lemmatize.md), [Named entity recognition](ner.md), and [Training your own pipeline](training.md).

@@ -1,24 +1,26 @@
-lang2nercorpus = {
-    'arabic': 'AQMAR',
-    'chinese': 'OntoNotes-Chinese',
-    'traditional-chinese': 'OntoNotes-Chinese',
-    'classical-chinese': 'OntoNotes-Chinese',
-    'dutch': 'CoNLL02-Dutch',
-    'english': 'CoNLL03-English',
-    'english-gum': 'CoNLL03-English',
-    'english-lines': 'CoNLL03-English',
-    'english-partut': 'CoNLL03-English',
-    'french': 'Wikiner-French',
-    'french-partut': 'Wikiner-French',
-    'french-sequoia': 'Wikiner-French',
-    'french-spoken': 'Wikiner-French',
-    'german': 'CoNLL02-German',
-    'german-hdt': 'CoNLL02-German',
-    'russian': 'Wikiner-Russian',
-    'russian-gsd': 'Wikiner-Russian',
-    'russian-taiga': 'Wikiner-Russian',
-    'spanish': 'CoNLL02-Spanish',
-    'spanish-gsd': 'CoNLL02-Spanish'
+langwithner = {
+    'arabic',
+    'chinese',
+    'traditional-chinese',
+    'classical-chinese',
+    'dutch',
+    'english',
+    'english-gum',
+    'english-lines',
+    'english-partut',
+    'french',
+    'french-partut',
+    'french-sequoia',
+    'french-spoken',
+    'german',
+    'german-hdt',
+    'russian',
+    'russian-gsd',
+    'russian-taiga',
+    'spanish',
+    'spanish-gsd',
+    'customized-ner',
+    'customized-mwt-ner',
 }
 
 lang2treebank = {
@@ -111,10 +113,14 @@ lang2treebank = {
     'ukrainian': 'UD_Ukrainian-IU',
     'urdu': 'UD_Urdu-UDTB',
     'uyghur': 'UD_Uyghur-UDT',
-    'vietnamese': 'UD_Vietnamese-VTB'
+    'vietnamese': 'UD_Vietnamese-VTB',
+    'customized': 'UD_Costumized',
+    'customized-mwt': 'UD_Costumized-MWT',
+    'customized-ner': 'UD_Costumized-NER',
+    'customized-mwt-ner': 'UD_Costumized-MWT-NER',
 }
 
-supported_langs = list(lang2treebank.keys())
+supported_langs = [lang for lang in list(lang2treebank.keys()) if not lang.startswith('customized')]
 
 treebank2lang = {v: k for k, v in lang2treebank.items()}
 
@@ -145,7 +151,7 @@ tbname2training_id = {"UD_Afrikaans-AfriBooms": 2, "UD_Ancient_Greek-Perseus": 2
                       "UD_Swedish_Sign_Language-SSLC": 2, "UD_Swedish-LinES": 2, "UD_Swedish-Talbanken": 2,
                       "UD_Tamil-TTB": 1, "UD_Telugu-MTG": 2, "UD_Turkish-IMST": 1, "UD_Ukrainian-IU": 1,
                       "UD_Upper_Sorbian-UFAL": 4, "UD_Urdu-UDTB": 2, "UD_Uyghur-UDT": 2, "UD_Vietnamese-VTB": 2,
-                      "UD_Wolof-WTB": 1}
+                      "UD_Wolof-WTB": 1, 'UD_Costumized': 2, 'UD_Costumized-MWT': 1, 'UD_Costumized-NER': 2, 'UD_Costumized-MWT-NER': 1}
 
 tbname2max_input_length = {  # this is for tokenization only
     'UD_Ancient_Greek-PROIEL': 350,
@@ -182,5 +188,5 @@ tbname2tokbatchsize = {
 }
 
 tbname2tagbatchsize = {
-'UD_Belarusian-HSE': 16
+    'UD_Belarusian-HSE': 16
 }

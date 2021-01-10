@@ -116,7 +116,7 @@ class NERDataset(Dataset):
 
         # load data
         self.config.vocab_fpath = os.path.join(self.config._save_dir, '{}.ner-vocab.json'.format(self.config.lang))
-        self.data = read_ner_data(self.config, bio_fpath, evaluate)
+        self.data = get_examples_from_bio_fpath(self.config, bio_fpath, evaluate)
 
         with open(self.config.vocab_fpath) as f:
             self.vocabs = json.load(f)

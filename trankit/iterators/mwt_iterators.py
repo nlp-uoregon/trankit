@@ -3,7 +3,7 @@ Adapted from https://github.com/stanfordnlp/stanza/blob/master/stanza/models/mwt
 Date: 2021/01/06
 '''
 from . import *
-from ..utils import seq2seq_utils
+from ..utils.mwt_lemma_utils import seq2seq_utils
 
 
 class MWTVocab(BaseVocab):

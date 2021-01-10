@@ -11,7 +11,6 @@ PUNCTUATION = re.compile(
 
 
 def normalize_input(input):
-    # lstrip input
     tmp = input.lstrip()
     lstrip_offset = len(input) - len(input.lstrip())
     return tmp, lstrip_offset
@@ -23,27 +22,27 @@ def get_start_char_idx(substring, text):
     return text, start_char_idx
 
 
-def pseudo_tokenize(sent_text):
+def split_to_substrings(sent_text):
     tokens_by_space = sent_text.split()
-    pseudo_tokens = []
+    substrings = []
     for token in tokens_by_space:
         if len(PUNCTUATION.findall(token)) > 0:
             tmp = ''
             for char in token:
                 if PUNCTUATION.match(char):
                     if tmp != '':
-                        pseudo_tokens.append(tmp)
+                        substrings.append(tmp)
                         tmp = ''
-                    pseudo_tokens.append(char)
+                    substrings.append(char)
                 else:
                     tmp += char
             if tmp != '':
-                pseudo_tokens.append(tmp)
+                substrings.append(tmp)
         else:
-            pseudo_tokens.append(token)
+            substrings.append(token)
 
-    assert len(''.join(sent_text.split())) == len(''.join(pseudo_tokens))
-    return pseudo_tokens
+    assert len(''.join(sent_text.split())) == len(''.join(substrings))
+    return substrings
 
 
 def get_startchar(word, text):
@@ -93,7 +92,7 @@ def wordpiece_tokenize_from_raw_text(wordpiece_splitter, sent_text, sent_labels,
             sent_text = sent_text.replace('۔', '.')
         elif treebank_name == 'UD_Uyghur-UDT':
             sent_text = sent_text.replace('-', '،')
-        pseudo_tokens = pseudo_tokenize(sent_text)
+        pseudo_tokens = split_to_substrings(sent_text)
     end_pids = set()
     group_pieces = [wordpiece_splitter.tokenize(t) for t in
                     pseudo_tokens]  # texts could be considered as a list of pseudo tokens
@@ -261,7 +260,6 @@ def charlevel_format_to_wordpiece_format(wordpiece_splitter, max_input_length, p
         })
 
     return final_examples
-
 
 
 def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_fpath):

@@ -1,13 +1,13 @@
 from .config import config as master_config
 from .models.base_models import Multilingual_Embedding
-from .models.classifiers import TokenizerClassifier, TaggerClassifier, NERClassifier
+from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
 from .models.mwt_model import MWTWrapper
 from .models.lemma_model import LemmaWrapper
 from .iterators.tokenizer_iterators import TokenizeDataset
 from .iterators.tagger_iterators import TaggerDataset
 from .iterators.ner_iterators import NERDataset
 from .utils.tokenizer_utils import *
-from .utils.ner_utils import *
+from .utils.scorers.ner_scorer import score_by_entity
 from collections import defaultdict
 from .utils.conll import *
 from .utils.tbinfo import tbname2training_id, lang2treebank
@@ -31,13 +31,10 @@ class TPipeline:
         if self._task == 'tokenize':
             self._embedding_layers = Multilingual_Embedding(self._config, model_name='tokenizer')
             self._embedding_layers.to(self._config.device)
-            if self._use_gpu:
-                self._embedding_layers.half()
+
             # tokenizers
             self._tokenizer = TokenizerClassifier(self._config, treebank_name=lang2treebank[self._lang])
             self._tokenizer.to(self._config.device)
-            if self._use_gpu:
-                self._tokenizer.half()
 
             self.model_parameters = [(n, p) for n, p in self._embedding_layers.named_parameters()] + \
                                     [(n, p) for n, p in self._tokenizer.named_parameters()]
@@ -45,13 +42,10 @@ class TPipeline:
         elif self._task == 'posdep':
             self._embedding_layers = Multilingual_Embedding(self._config, model_name='tagger')
             self._embedding_layers.to(self._config.device)
-            if self._use_gpu:
-                self._embedding_layers.half()
+
             # taggers
-            self._tagger = TaggerClassifier(self._config, treebank_name=lang2treebank[self._lang])
+            self._tagger = PosDepClassifier(self._config, treebank_name=lang2treebank[self._lang])
             self._tagger.to(self._config.device)
-            if self._use_gpu:
-                self._tagger.half()
 
             self.model_parameters = [(n, p) for n, p in self._embedding_layers.named_parameters()] + \
                                     [(n, p) for n, p in self._tagger.named_parameters()]
@@ -59,20 +53,16 @@ class TPipeline:
             # mwt
             self._mwt_model = MWTWrapper(self._config, treebank_name=self._config.treebank_name,
                                          use_gpu=self._use_gpu, evaluate=False)
-        elif self._task == 'lemma':
+        elif self._task == 'lemmatize':
             # lemma
             self._lemma_model = LemmaWrapper(self._config, treebank_name=self._config.treebank_name,
                                              use_gpu=self._use_gpu, evaluate=False)
         elif self._task == 'ner':
             self._embedding_layers = Multilingual_Embedding(self._config, model_name='ner')
             self._embedding_layers.to(self._config.device)
-            if self._use_gpu:
-                self._embedding_layers.half()
 
             self._ner_model = NERClassifier(self._config, self._lang)
             self._ner_model.to(self._config.device)
-            if self._use_gpu:
-                self._ner_model.half()
 
             self.model_parameters = [(n, p) for n, p in self._embedding_layers.named_parameters()] + \
                                     [(n, p) for n, p in self._ner_model.named_parameters()]
@@ -112,9 +102,9 @@ class TPipeline:
         torch.cuda.empty_cache()
 
         # lang and data
-        self._lang = 'unknown'
+        self._lang = training_config['category'] if 'category' in training_config else 'customized'
         self._task = training_config['task']
-        assert self._task in ['tokenize', 'mwt', 'posdep', 'lemma', 'ner']
+        assert self._task in ['tokenize', 'mwt', 'posdep', 'lemmatize', 'ner']
         self._text_split_by_space = training_config[
             'text_split_by_space'] if 'text_split_by_space' in training_config else True  # deal with languages like Chinese, Japanese
         if not self._text_split_by_space:
@@ -139,13 +129,14 @@ class TPipeline:
 
         if self._task == 'tokenize':
             assert self._train_txt_fpath and self._train_conllu_fpath and self._dev_txt_fpath and self._dev_conllu_fpath, 'Missing one of these files: (i) train/dev txt file containing raw text (ii) train/dev conllu file containing annotated labels'
-        elif self._task in ['posdep', 'mwt', 'lemma']:
+        elif self._task in ['posdep', 'mwt', 'lemmatize']:
             assert self._train_conllu_fpath and self._dev_conllu_fpath, 'Missing one of these files: train/dev conllu file containing annotated labels'
         elif self._task == 'ner':
             assert self._train_bio_fpath and self._dev_bio_fpath, 'Missing one of these files: train/dev BIO file containing annotated NER labels'
 
         # device and save dir
         self._save_dir = training_config['save_dir'] if 'save_dir' in training_config else './cache/'
+        self._save_dir = os.path.join(self._save_dir, self._lang)
         self._cache_dir = self._save_dir
         self._gpu = training_config['gpu'] if 'gpu' in training_config else True
         self._use_gpu = training_config['gpu'] if 'gpu' in training_config else True
@@ -166,8 +157,18 @@ class TPipeline:
         self._config.treebank_name = treebank_name
 
         # training hyper-parameters
-        self._config.max_input_length = training_config['max_input_length'] if 'max_input_length' in training_config else 512  # this is for tokenizer only
-        self._config.batch_size = training_config['batch_size'] if 'batch_size' in training_config else 4
+        self._config.max_input_length = training_config[
+            'max_input_length'] if 'max_input_length' in training_config else 512  # this is for tokenizer only
+
+        if 'batch_size' in training_config:
+            self._config.batch_size = training_config['batch_size']
+        elif training_config['task'] == 'tokenize':
+            self._config.batch_size = 4
+        elif training_config['task'] in ['posdep', 'ner']:
+            self._config.batch_size = 16
+        elif training_config['task'] in ['mwt', 'lemmatize']:
+            self._config.batch_size = 50
+
         self._config.max_epoch = training_config['max_epoch'] if 'max_epoch' in training_config else 100
 
         # logging
@@ -184,7 +185,7 @@ class TPipeline:
         self._config.logger = self.logger
 
         # wordpiece splitter
-        if self._task not in ['mwt', 'lemma']:
+        if self._task not in ['mwt', 'lemmatize']:
             master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base',
                                                                                    cache_dir=os.path.join(
                                                                                        master_config._save_dir,
@@ -226,6 +227,10 @@ class TPipeline:
             in_conllu = {
                 'dev': os.path.join(self._config._save_dir, 'preds', 'tokenizer.dev.conllu')
             }
+            if not os.path.exists(in_conllu['dev']):
+                in_conllu = {
+                    'dev': self._dev_conllu_fpath
+                }
 
         self.train_set = TaggerDataset(
             self._config,
@@ -289,7 +294,7 @@ class TPipeline:
             self._prepare_mwt()
         elif self._task == 'posdep':
             self._prepare_posdep()
-        elif self._task == 'lemma':
+        elif self._task == 'lemmatize':
             self._prepare_lemma()
         elif self._task == 'ner':
             self._prepare_ner()
@@ -324,8 +329,8 @@ class TPipeline:
                     printout=False
                 )
             progress.close()
-            dev_score = self._eval_tokenize(data_set=self.dev_set, batch_num=self.dev_batch_num,
-                                            name='dev', epoch=epoch)
+            dev_score, pred_conllu_fpath = self._eval_tokenize(data_set=self.dev_set, batch_num=self.dev_batch_num,
+                                                               name='dev', epoch=epoch)
 
             if epoch <= 30 or dev_score['average'] > best_dev['average']:
                 self._save_model(ckpt_fpath=os.path.join(self._config._save_dir,
@@ -333,17 +338,15 @@ class TPipeline:
                                  epoch=epoch)
                 best_dev = dev_score
                 best_epoch = epoch
-                # update best results
-                os.system('mv {} {}'.format(
-                    os.path.join(self._config._save_dir, 'preds',
-                                 'tokenizer.dev.conllu' + '.epoch-{}'.format(epoch)),
-                    os.path.join(self._config._save_dir, 'preds', 'tokenizer.dev.conllu'),
-                ))
 
+                os.rename(
+                    pred_conllu_fpath,
+                    os.path.join(self._config._save_dir, 'preds', 'tokenizer.dev.conllu')
+                )
+
+            remove_with_path(pred_conllu_fpath)
             self._printlog('-' * 30 + ' Best dev CoNLLu score: epoch {}'.format(best_epoch) + '-' * 30)
             self._printlog(get_ud_performance_table(dev_score))
-            # remove old files
-            os.system('rm -rf {}/tokenizer*epoch*'.format(os.path.join(self._config._save_dir, 'preds')))
 
     def _eval_tokenize(self, data_set, batch_num, name, epoch):
         self._embedding_layers.eval()
@@ -434,7 +437,7 @@ class TPipeline:
 
         score = get_ud_score(pred_conllu_fpath, gold_conllu_fpath)
         score['epoch'] = epoch
-        return score
+        return score, pred_conllu_fpath
 
     def _train_mwt(self):
         self._mwt_model.train()
@@ -469,8 +472,8 @@ class TPipeline:
                     printout=False
                 )
             progress.close()
-            dev_score = self._eval_posdep(data_set=self.dev_set, batch_num=self.dev_batch_num,
-                                          name='dev', epoch=epoch)
+            dev_score, pred_conllu_fpath = self._eval_posdep(data_set=self.dev_set, batch_num=self.dev_batch_num,
+                                                             name='dev', epoch=epoch)
 
             if epoch <= 30 or dev_score['average'] > best_dev['average']:
                 self._save_model(ckpt_fpath=os.path.join(self._config._save_dir,
@@ -478,19 +481,13 @@ class TPipeline:
                                  epoch=epoch)
                 best_dev = dev_score
                 best_epoch = epoch
-                # update best results
-                # update best results
-                os.system('mv {} {}'.format(
-                    os.path.join(self._config._save_dir, 'preds',
-                                 'tagger.dev.conllu' + '.epoch-{}'.format(epoch)),
-                    os.path.join(self._config._save_dir, 'preds', 'tagger.dev.conllu'),
-                ))
-
-                # printout current best dev
+                os.rename(
+                    pred_conllu_fpath,
+                    os.path.join(self._config._save_dir, 'preds', 'tagger.dev.conllu')
+                )
+            remove_with_path(pred_conllu_fpath)
             self._printlog('-' * 30 + ' Best dev CoNLLu score: epoch {}'.format(best_epoch) + '-' * 30)
             self._printlog(get_ud_performance_table(dev_score))
-            # remove old files
-            os.system('rm -rf {}/tagger*epoch*'.format(os.path.join(self._config._save_dir, 'preds')))
 
     def _eval_posdep(self, data_set, batch_num, name, epoch):
         self._embedding_layers.eval()
@@ -518,7 +515,7 @@ class TPipeline:
             predicted_dep = predictions[3]
             sentlens = [l + 1 for l in batch.word_num]
             head_seqs = [chuliu_edmonds_one_root(adj[:l, :l])[1:] for adj, l in
-                         zip(predicted_dep[0], sentlens)]  # remove attachment for the root
+                         zip(predicted_dep[0], sentlens)]
             deprel_seqs = [[self._config.itos[DEPREL][predicted_dep[1][i][j + 1][h]] for j, h in
                             enumerate(hs)] for
                            i, hs
@@ -558,7 +555,7 @@ class TPipeline:
         CoNLL.dict2conll(doc, pred_conllu_fpath)
         score = get_ud_score(pred_conllu_fpath, data_set.gold_conllu)
         score['epoch'] = epoch
-        return score
+        return score, pred_conllu_fpath
 
     def _train_lemma(self):
         self._lemma_model.train()
@@ -659,7 +656,7 @@ class TPipeline:
             self._train_mwt()
         elif self._task == 'posdep':
             self._train_posdep()
-        elif self._task == 'lemma':
+        elif self._task == 'lemmatize':
             self._train_lemma()
         elif self._task == 'ner':
             self._train_ner()

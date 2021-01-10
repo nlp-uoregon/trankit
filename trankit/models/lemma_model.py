@@ -3,9 +3,7 @@ Adapted from https://github.com/stanfordnlp/stanza/blob/master/stanza/models/lem
 Date: 2021/01/06
 '''
 import sys
-from .seq2seq_model import Seq2SeqModel
-from ..utils.seq2seq_utils import *
-from ..utils.seq2seq_vocabs import *
+from trankit.layers.seq2seq import Seq2SeqModel
 from ..iterators.lemmatizer_iterators import LemmaDataLoader
 from ..utils.base_utils import *
 
@@ -335,10 +333,11 @@ class LemmaWrapper:
     def get_lemma_trainer(self, language, use_gpu):
         args = get_args()
         args['mode'] = 'train'
-        args['batch_size'] = 50
+        args['batch_size'] = self.config.batch_size
         args['lang'] = language
         args['cuda'] = use_gpu
         args['model_dir'] = self.config._save_dir
+        args['num_epoch'] = self.config.max_epoch
 
         self.train_file = self.config.train_conllu_fpath
         # pred and gold path
@@ -363,8 +362,8 @@ class LemmaWrapper:
 
         # skip training if the language does not have training or dev data
         if len(self.train_batch) == 0 or len(self.dev_batch) == 0:
-            print("[Skip training because no data available...]")
-            self.config.logger.info("[Skip training because no data available...]")
+            print("This language does not require multi-word token expansion")
+            self.config.logger.info("This language does not require multi-word token expansion")
             sys.exit(0)
 
         # initialize a trainer
@@ -372,19 +371,17 @@ class LemmaWrapper:
 
         self.args = args
         self.loaded_args, self.vocab = self.trainer.args, self.trainer.vocab
-        print('Initialized lemmatizer trainer!')
+        print('Initialized lemmatizer trainer')
         self.config.logger.info('Initialized lemmatizer trainer!')
 
     def train(self):
         if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB']:
-            print("[Training dictionary-based lemmatizer...]")
-            self.config.logger.info("[Training dictionary-based lemmatizer...]")
+            print("Training dictionary-based lemmatizer")
+            self.config.logger.info("Training dictionary-based lemmatizer")
             self.trainer.train_dict(
                 [[token[TEXT], token[UPOS], token[LEMMA]] for sentence in self.train_batch.doc for token in sentence if
                  not (
                          type(token[ID]) == tuple and len(token[ID]) == 2)])
-            print("Evaluating on dev set...")
-            self.config.logger.info("Evaluating on dev set...")
             dev_preds = self.trainer.predict_dict(
                 [[token[TEXT], token[UPOS]] for sentence in self.dev_batch.doc for token in sentence if
                  not (type(token[ID]) == tuple and len(token[ID]) == 2)])
@@ -395,8 +392,8 @@ class LemmaWrapper:
             self.config.logger.info("Dev F1 = {:.2f}".format(dev_f * 100))
 
             # train a seq2seq model
-            print("[Training seq2seq-based lemmatizer...]")
-            self.config.logger.info("[Training seq2seq-based lemmatizer...]")
+            print("Training seq2seq-based lemmatizer")
+            self.config.logger.info("Training seq2seq-based lemmatizer")
             global_step = 0
             max_steps = len(self.train_batch) * self.args['num_epoch']
             dev_score_history = []
@@ -424,8 +421,6 @@ class LemmaWrapper:
                                               max_steps, epoch, self.args['num_epoch'], loss, duration, current_lr))
                 progress.close()
                 # eval on dev
-                print("Evaluating on dev set...")
-                self.config.logger.info("Evaluating on dev set...")
                 dev_preds = []
                 dev_edits = []
                 for i, batch in enumerate(self.dev_batch):
@@ -438,8 +433,8 @@ class LemmaWrapper:
                      not (type(token[ID]) == tuple and len(token[ID]) == 2)], dev_preds, edits=dev_edits)
 
                 # try ensembling with dict if necessary
-                print("[Ensembling dict with seq2seq model...]")
-                self.config.logger.info("[Ensembling dict with seq2seq model...]")
+                print("Ensembling dict with seq2seq model")
+                self.config.logger.info("Ensembling dict with seq2seq model")
                 dev_preds = self.trainer.ensemble(
                     [[token[TEXT], token[UPOS]] for sentence in self.dev_batch.doc for token in sentence if
                      not (type(token[ID]) == tuple and len(token[ID]) == 2)], dev_preds)
@@ -453,7 +448,7 @@ class LemmaWrapper:
                 # save best model
                 if epoch == 1 or dev_score['Lemmas'].f1 > max(dev_score_history):
                     self.trainer.save(self.model_file)
-                    print("new best model saved.")
+                    print("Saving new best model to ... {}".format(self.model_file))
                     best_dev_score = dev_score
                 print(get_ud_performance_table(best_dev_score))
                 self.config.logger.info(get_ud_performance_table(best_dev_score))
@@ -466,12 +461,12 @@ class LemmaWrapper:
 
                 dev_score_history += [dev_score['Lemmas'].f1]
 
-            print("Training ended with {} epochs.".format(epoch))
-            self.config.logger.info("Training ended with {} epochs.".format(epoch))
+            print("Training done")
+            self.config.logger.info("Training done")
 
         else:
-            print('This language does not require lemmatization. Training done!')
-            self.config.logger.info('This language does not require lemmatization. Training done!')
+            print('This language does not require lemmatization.')
+            self.config.logger.info('This language does not require lemmatization.')
 
     def predict(self, tagged_doc, obmit_tag):
         if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB']:
@@ -482,9 +477,7 @@ class LemmaWrapper:
 
             # skip eval if dev data does not exist
             if len(batch) == 0:
-                print("Skip evaluation because no dev data is available...")
-                print("Lemma score:")
-                print("{} ".format(self.args['lang']))
+                print("No dev data available...")
                 sys.exit(0)
             predict_dict_input = []
             for sentence in batch.doc:

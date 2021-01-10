@@ -1,6 +1,6 @@
 from .config import config as master_config
 from .models.base_models import Multilingual_Embedding
-from .models.classifiers import TokenizerClassifier, TaggerClassifier, NERClassifier
+from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
 from .models.mwt_model import MWTWrapper
 from .models.lemma_model import LemmaWrapper
 from .iterators.tokenizer_iterators import TokenizeDatasetLive
@@ -80,7 +80,7 @@ class Pipeline:
         # taggers
         self._tagger = {}
         for lang in self.added_langs:
-            self._tagger[lang] = TaggerClassifier(self._config, treebank_name=lang2treebank[lang])
+            self._tagger[lang] = PosDepClassifier(self._config, treebank_name=lang2treebank[lang])
             self._tagger[lang].to(self._config.device)
             if self._use_gpu:
                 self._tagger[lang].half()
@@ -99,7 +99,7 @@ class Pipeline:
         # ner if possible
         self._ner_model = {}
         for lang in self.added_langs:
-            if lang in lang2nercorpus:
+            if lang in langwithner:
                 self._ner_model[lang] = NERClassifier(self._config, lang)
                 self._ner_model[lang].to(self._config.device)
                 if self._use_gpu:
@@ -169,7 +169,7 @@ class Pipeline:
                                                           treebank2lang[treebank_name]))) as f:
             vocabs = json.load(f)
             self._config.vocabs[treebank_name] = vocabs
-        if lang in lang2nercorpus:
+        if lang in langwithner:
             with open(os.path.join(self._config._cache_dir,
                                    '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                 self._config.ner_vocabs[lang] = json.load(f)
@@ -184,7 +184,7 @@ class Pipeline:
             self._tokenizer[lang].half()
         self._tokenizer[lang].eval()
         # add tagger
-        self._tagger[lang] = TaggerClassifier(self._config, treebank_name=lang2treebank[lang])
+        self._tagger[lang] = PosDepClassifier(self._config, treebank_name=lang2treebank[lang])
         self._tagger[lang].to(self._config.device)
         if self._use_gpu:
             self._tagger[lang].half()
@@ -196,7 +196,7 @@ class Pipeline:
         # lemma
         self._lemma_model[lang] = LemmaWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
         # ner if possible
-        if lang in lang2nercorpus:
+        if lang in langwithner:
             self._ner_model[lang] = NERClassifier(self._config, lang)
             self._ner_model[lang].to(self._config.device)
             if self._use_gpu:
@@ -223,7 +223,7 @@ class Pipeline:
             self._config.itos[lang][FEATS] = {v: k for k, v in vocabs[FEATS].items()}
             self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
             # ner vocabs
-            if lang in lang2nercorpus:
+            if lang in langwithner:
                 with open(os.path.join(self._config._cache_dir,
                                        '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                     self._config.ner_vocabs[lang] = json.load(f)
@@ -893,14 +893,14 @@ class Pipeline:
                 tokenized_sent = [{ID: k + 1, TEXT: w} for k, w in enumerate(input)]
                 tagged_sent = self._posdep_sent(tokenized_sent)
                 out = self._lemmatize_sent(tagged_sent)
-                if self._config.active_lang in lang2nercorpus:  # ner if possible
+                if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_sent(out)
                 final = {TOKENS: out}
             else:
                 ori_text = deepcopy(input)
                 tagged_sent = self._posdep_sent(input)
                 out = self._lemmatize_sent(tagged_sent)
-                if self._config.active_lang in lang2nercorpus:  # ner if possible
+                if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_sent(out)
                 final = {TEXT: ori_text, TOKENS: out}
         else:
@@ -912,14 +912,14 @@ class Pipeline:
                          enumerate(input)]
                 tagged_doc = self._posdep_doc(input)
                 out = self._lemmatize_doc(tagged_doc)
-                if self._config.active_lang in lang2nercorpus:  # ner if possible
+                if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_doc(out)
                 final = {SENTENCES: out}
             else:
                 ori_text = deepcopy(input)
                 tagged_doc = self._posdep_doc(in_doc=input)
                 out = self._lemmatize_doc(tagged_doc)
-                if self._config.active_lang in lang2nercorpus:  # ner if possible
+                if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_doc(out)
                 final = {TEXT: ori_text, SENTENCES: out}
         return final
