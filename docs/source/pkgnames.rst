@@ -61,7 +61,7 @@ In the table below we show 100 languages that users can use the training data of
 
 Pretrained Languages & Their Code Names
 ---------------------------------------
-Trankit provides 90 pretrained pipelines for 56 languages. Each pretrained pipeline is associated with a treebank that it is trained on. Below we show the 56 pretrained languages, their corresponding treebanks, and the code names to initialize pretrained pipelines. *The pretrained pipelines can be directly downloaded by clicking on their code names in the table below.*
+Trankit provides 90 pretrained pipelines for 56 languages. Each pretrained pipeline is associated with a treebank that it is trained on. Below we show the 56 pretrained languages, their corresponding treebanks, and the code names to initialize pretrained pipelines.
 
 Note that, the names of the default treebanks are put inside the brackets []. For example, English has 4 treebanks, which are *UD_English-EWT*, *UD_English-GUM*, *UD_English-LinES*, and *UD_English-ParTUT*. The treebank *UD_English-EWT* is put inside a bracket [], so it is the default treebank for English. Looking at the following table, we can select the appropriate code name and follow the instructions `here <https://trankit.readthedocs.io/en/latest/overview.html#monolingual-usage>`_ to initialize a pipeline. For example, if we want to initialize a pipeline that is trained on the default treebank *UD_English-EWT*, we can use the code name *english*; to initialize a pipeline that is trained on a non-default treebank such as *UD_English-GUM*, we can use *english-gum*.
 
