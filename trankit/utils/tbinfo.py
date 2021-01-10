@@ -114,10 +114,10 @@ lang2treebank = {
     'urdu': 'UD_Urdu-UDTB',
     'uyghur': 'UD_Uyghur-UDT',
     'vietnamese': 'UD_Vietnamese-VTB',
-    'customized': 'UD_Costumized',
-    'customized-mwt': 'UD_Costumized-MWT',
-    'customized-ner': 'UD_Costumized-NER',
-    'customized-mwt-ner': 'UD_Costumized-MWT-NER',
+    'customized': 'UD_Customized',
+    'customized-mwt': 'UD_Customized-MWT',
+    'customized-ner': 'UD_Customized-NER',
+    'customized-mwt-ner': 'UD_Customized-MWT-NER',
 }
 
 supported_langs = [lang for lang in list(lang2treebank.keys()) if not lang.startswith('customized')]
@@ -151,7 +151,7 @@ tbname2training_id = {"UD_Afrikaans-AfriBooms": 2, "UD_Ancient_Greek-Perseus": 2
                       "UD_Swedish_Sign_Language-SSLC": 2, "UD_Swedish-LinES": 2, "UD_Swedish-Talbanken": 2,
                       "UD_Tamil-TTB": 1, "UD_Telugu-MTG": 2, "UD_Turkish-IMST": 1, "UD_Ukrainian-IU": 1,
                       "UD_Upper_Sorbian-UFAL": 4, "UD_Urdu-UDTB": 2, "UD_Uyghur-UDT": 2, "UD_Vietnamese-VTB": 2,
-                      "UD_Wolof-WTB": 1, 'UD_Costumized': 2, 'UD_Costumized-MWT': 1, 'UD_Costumized-NER': 2, 'UD_Costumized-MWT-NER': 1}
+                      "UD_Wolof-WTB": 1, 'UD_Customized': 2, 'UD_Customized-MWT': 1, 'UD_Customized-NER': 2, 'UD_Customized-MWT-NER': 1}
 
 tbname2max_input_length = {  # this is for tokenization only
     'UD_Ancient_Greek-PROIEL': 350,

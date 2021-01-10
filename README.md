@@ -274,7 +274,7 @@ posdeps = p.posdep(untokenized_doc) # upos, xpos, ufeats, dep parsing
 ners = p.ner(untokenized_doc) # ner tagging
 lemmas = p.lemmatize(untokenized_doc) # lemmatization
 ```
-WARNING: Although pretokenized inputs can always be processed, using pretokenized inputs for languages that require multi-word token expansion such as Arabic or French might not be the correct way. Check out this list to see if a particular language requires multi-word token expansion or not.  
+Note that, although pretokenized inputs can always be processed, using pretokenized inputs for languages that require multi-word token expansion such as Arabic or French might not be the correct way. Please check out the column `Requires MWT expansion` of [this table](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) to see if a particular language requires multi-word token expansion or not.  
 For more detailed examples, please checkout our [documentation page](https://trankit.readthedocs.io/en/latest/overview.html).
 
 #### Multilingual usage
