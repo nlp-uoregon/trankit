@@ -98,6 +98,7 @@ trainer = trankit.TPipeline(
     training_config={
     'category': 'customized-mwt-ner',  # pipeline category
     'task': 'ner', # task name
+    'batch_size': 32,
     'save_dir': './save_dir', # directory to save the trained model
     'train_bio_fpath': './train.bio', # training data in BIO format
     'dev_bio_fpath': './dev.bio' # training data in BIO format
