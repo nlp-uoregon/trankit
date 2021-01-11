@@ -2,16 +2,11 @@ from .pipeline import Pipeline
 from .pipeline import treebank2lang, get_ud_score, get_ud_performance_table
 import sys, os
 from time import time
-from datetime import datetime
-
-# evaluate pretrained pipelines
-if len(sys.argv) < 4:
-    print(
-        'Not enough specified arguments! Please use the command, for example: python -m trankit UD_English-EWT test.input-text.txt test.gold.conllu $device\nwhere $device=gpu or $device=cpu')
+import glob
 
 tbname = sys.argv[1]
-input_fpath = sys.argv[2]
-gold_conllu = sys.argv[3]
+input_fpath = glob.glob(os.path.join('ud-treebanks-v2.5', tbname, '*-test.txt'))[0]
+gold_conllu = glob.glob(os.path.join('ud-treebanks-v2.5', tbname, '*-test.conllu'))[0]
 tblang = treebank2lang[tbname]
 
 pretrained_pipeline = Pipeline(tblang)
