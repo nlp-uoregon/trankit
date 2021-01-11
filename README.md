@@ -244,7 +244,7 @@ p = Pipeline(lang='english', gpu=True, cache_dir='./cache')
 ```
 
 #### Basic functions
-Trankit can process inputs which are untokenized (raw) or pretokenized strings, at both sentence and document level. A pretokenized input can be a list of strings (i.e., a tokenized sentence) or a list of lists of strings (i.e., a tokenized document with multiple tokenized sentences) are automatically recognized by Trankit. If the input is a sentence, the tag `is_sent` must be set to True. 
+Trankit can process inputs which are untokenized (raw) or pretokenized strings, at both sentence and document level. A pretokenized input can be a list of strings (i.e., a tokenized sentence) or a list of lists of strings (i.e., a tokenized document with multiple tokenized sentences) which is automatically recognized by Trankit. If the input is a sentence, the tag `is_sent` must be set to True. 
 ```python
 from trankit import Pipeline
 

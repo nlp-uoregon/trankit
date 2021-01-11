@@ -87,6 +87,25 @@ class TPipeline:
                                                             num_warmup_steps=self.batch_num * 5,
                                                             num_training_steps=self.batch_num * self._config.max_epoch)
 
+    def _detect_split_by_space_lang(self, train_txt_fpath):
+        if train_txt_fpath is None:
+            return True
+        else:
+            with open(train_txt_fpath) as f:
+                lines = [line.strip() for line in f.readlines() if line.strip()]
+            line_ids = list(range(len(lines)))
+            random.shuffle(line_ids)
+            _100_random_lines = [lines[lid] for lid in line_ids[:100]]
+            split_by_space = 0.
+            for line in _100_random_lines:
+                if len(line[:100]) > len(line[:100].replace(' ', '')):
+                    split_by_space += 1
+
+            if split_by_space / len(_100_random_lines) > 0.8:
+                return True
+            else:
+                return False
+
     def _set_up_config(self, training_config):
         print('Setting up training config...')
         # set random seed
@@ -105,14 +124,6 @@ class TPipeline:
         self._lang = training_config['category'] if 'category' in training_config else 'customized'
         self._task = training_config['task']
         assert self._task in ['tokenize', 'mwt', 'posdep', 'lemmatize', 'ner']
-        self._text_split_by_space = training_config[
-            'text_split_by_space'] if 'text_split_by_space' in training_config else True  # deal with languages like Chinese, Japanese
-        if not self._text_split_by_space:
-            treebank_name = 'UD_Chinese-GSD'
-        else:
-            treebank_name = lang2treebank.get(self._lang, 'UD_{}-New'.format(self._lang))
-        lang2treebank[self._lang] = treebank_name
-        treebank2lang[treebank_name] = self._lang
 
         # the following variables are used for UD training
         self._train_txt_fpath = training_config['train_txt_fpath'] if 'train_txt_fpath' in training_config else None
@@ -133,6 +144,14 @@ class TPipeline:
             assert self._train_conllu_fpath and self._dev_conllu_fpath, 'Missing one of these files: train/dev conllu file containing annotated labels'
         elif self._task == 'ner':
             assert self._train_bio_fpath and self._dev_bio_fpath, 'Missing one of these files: train/dev BIO file containing annotated NER labels'
+        # detect if text in this language is split by spaces or not
+        self._text_split_by_space = self._detect_split_by_space_lang(self._train_txt_fpath)
+        if not self._text_split_by_space:
+            treebank_name = 'UD_Japanese-like'  # use this special name to note that text is not split by spaces, similar to Japanese language.
+        else:
+            treebank_name = lang2treebank.get(self._lang, 'UD_{}-New'.format(self._lang))
+        lang2treebank[self._lang] = treebank_name
+        treebank2lang[treebank_name] = self._lang
 
         # device and save dir
         self._save_dir = training_config['save_dir'] if 'save_dir' in training_config else './cache/'
