@@ -41,7 +41,6 @@ def split_to_substrings(sent_text):
         else:
             substrings.append(token)
 
-    assert len(''.join(sent_text.split())) == len(''.join(substrings))
     return substrings
 
 
@@ -79,7 +78,6 @@ def get_mapping_wp_character_to_or_character(wordpiece_splitter, wp_single_strin
             c_id = len(converted_text)
             wp_char_to_or_char[c_id] = char_id
             converted_text += converted_c
-    assert wp_single_string == converted_text
     return wp_char_to_or_char
 
 
@@ -265,7 +263,7 @@ def charlevel_format_to_wordpiece_format(wordpiece_splitter, max_input_length, p
 def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_fpath):
     '''
     Adapted from https://github.com/stanfordnlp/stanza/blob/master/stanza/utils/prepare_tokenizer_data.py
-    Date: 2021/01/06
+    Date: 2021/01/11
     '''
     with open(plaintext_file, 'r') as f:
         corpus_text = ''.join(f.readlines())
@@ -273,10 +271,9 @@ def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_f
     ensure_dir(os.path.abspath(os.path.join(char_labels_output_fpath, '..')))
     output = open(char_labels_output_fpath, 'w')
 
-    index = 0  # character offset in rawtext
+    index = 0  
 
     def is_para_break(index, text):
-        """ Detect if a paragraph break can be found, and return the length of the paragraph break sequence. """
         if text[index] == '\n':
             para_break = PARAGRAPH_BREAK.match(text[index:])
             if para_break:
@@ -285,32 +282,21 @@ def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_f
         return False, 0
 
     def find_next_word(index, text, word, output):
-        """
-        Locate the next word in the text. In case a paragraph break is found, also write paragraph break to labels.
-        """
         idx = 0
         word_sofar = ''
         yeah = False
         while index < len(text) and idx < len(word):
             para_break, break_len = is_para_break(index, text)
             if para_break:
-                # multiple newlines found, paragraph break
                 if len(word_sofar) > 0:
-                    assert re.match(r'^\s+$',
-                                    word_sofar), 'Found non-empty string at the end of a paragraph that doesn\'t match any token: |{}|'.format(
-                        word_sofar)
                     word_sofar = ''
 
                 output.write('\n\n')
                 index += break_len - 1
             elif re.match(r'^\s$', text[index]) and not re.match(r'^\s$', word[idx]):
-                # whitespace found, and whitespace is not part of a word
                 word_sofar += text[index]
             else:
-                # non-whitespace char, or a whitespace char that's part of a word
                 word_sofar += text[index]
-                assert text[index].replace('\n', ' ') == word[
-                    idx], "Character mismatch: raw text contains |%s| but the next word is |%s|." % (word_sofar, word)
                 idx += 1
             index += 1
         return index, word_sofar
@@ -324,19 +310,16 @@ def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_f
             line = line.strip()
             if len(line):
                 if line[0] == "#":
-                    # comment, don't do anything
                     if len(last_comments) == 0:
                         last_comments = line
                     continue
 
                 line = line.split('\t')
                 if '.' in line[0]:
-                    # the tokenizer doesn't deal with ellipsis
                     continue
 
                 word = line[1]
                 if '-' in line[0]:
-                    # multiword token
                     mwtbegin, mwtend = [int(x) for x in line[0].split('-')]
                 elif mwtbegin <= int(line[0]) < mwtend:
                     continue
@@ -350,7 +333,6 @@ def conllu_to_charlevel_format(plaintext_file, conllu_file, char_labels_output_f
                 index, word_found = find_next_word(index, corpus_text, word, output)
                 buf = '0' * (len(word_found) - 1) + ('1' if '-' not in line[0] else '3')
             else:
-                # sentence break found
                 if len(buf):
                     assert int(buf[-1]) >= 1
                     output.write(buf[:-1] + '{}'.format(int(buf[-1]) + 1))

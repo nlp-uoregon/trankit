@@ -40,7 +40,7 @@ Citation
 .. code-block:: bibtex
 
    @article{unset,
-      title={unset,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing,
       author={unset},
       journal={arXiv preprint},
       year={2021},
