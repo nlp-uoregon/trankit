@@ -61,14 +61,13 @@ def download(cache_dir, language):  # put a try-catch here
     lang_dir = os.path.join(cache_dir, language)
     save_fpath = os.path.join(cache_dir, language, '{}.zip'.format(language))
 
-    if not os.path.exists(os.path.join(lang_dir, '{}.downloaded'.format(language))):
-        # print('Downloading saved models for {} ...'.format(language))
+    if not os.path.exists(os.path.join(lang_dir, '.downloaded')):
         url = "http://nlp.uoregon.edu/download/trankit/{}.zip".format(language)
         print(url)
 
         response = requests.get(url, stream=True)
         total_size_in_bytes = int(response.headers.get('content-length', 0))
-        block_size = 1024  # 1 Kibibyte
+        block_size = 1024
         progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc='Downloading: ')
 
         ensure_dir(lang_dir)
@@ -81,7 +80,7 @@ def download(cache_dir, language):  # put a try-catch here
         if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
             print("Failed to download saved models for {}!".format(language))
         else:
-            with open(os.path.join(lang_dir, '{}.downloaded'.format(language)), 'w') as f:
+            with open(os.path.join(lang_dir, '.downloaded'), 'w') as f:
                 f.write('')
 
 
