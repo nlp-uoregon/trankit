@@ -3,7 +3,7 @@ from time import sleep
 
 p = trankit.Pipeline('english')
 
-ner_langs = ['arabic', 'chinese', 'dutch', 'english', 'french', 'german', 'spanish', 'russian']
+num_passed = 0
 
 for lid, lang in enumerate(trankit.supported_langs):
     p.add(lang)
@@ -35,4 +35,8 @@ for lid, lang in enumerate(trankit.supported_langs):
         ner3 = p.ner([[w['text'] for w in sent['tokens']] for sent in tokens['sentences']])
         ner4 = p.ner([w['text'] for w in tokens2['tokens']], is_sent=True)
     print('*' * 30 + ' {}:{}: PASSED '.format(lid, lang) + '*' * 30)
-    sleep(3)
+    num_passed += 1
+    sleep(1)
+
+print('=' * 20 + ' SUMMARY ' + '=' * 20)
+print('Total passed: {}'.format(num_passed))
