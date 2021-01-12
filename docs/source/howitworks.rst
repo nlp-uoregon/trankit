@@ -1,7 +1,7 @@
 How Trankit works
 =================
 
-*Note: The best way to understand how Trankit works is to look at our technical paper, which is available at*: https://arxiv.org/
+*Note: The best way to understand how Trankit works is to look at our technical paper, which is available at*: https://arxiv.org/pdf/2101.03289.pdf
 
 In this section, we briefly present the most important details of the technologies used by Trankit.
 

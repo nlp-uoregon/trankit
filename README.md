@@ -204,7 +204,7 @@ Performance comparison between Trankit and these toolkits on other languages can
 
 We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoregon.edu/trankit
 
-Technical details about Trankit are presented in [our following paper](https://arxiv.org/abs/2101.03289). Please cite the paper if you use Trankit in your software or research.
+Technical details about Trankit are presented in [our following paper](https://arxiv.org/pdf/2101.03289.pdf). Please cite the paper if you use Trankit in your software or research.
 
 ```bibtex
 @misc{nguyen2021trankit,

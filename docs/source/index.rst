@@ -14,7 +14,7 @@ Trankit's Demo Website is hosted at: http://nlp.uoregon.edu/trankit
 
 Citation
 ========
-If you use Trankit in your research or software. Please cite our following paper:
+If you use Trankit in your research or software. Please cite `our following paper <https://arxiv.org/pdf/2101.03289.pdf>`_:
 
 .. code-block:: bibtex
 
