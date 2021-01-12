@@ -46,6 +46,10 @@ The output would look like this:
 ```
 ### Pretokenized input
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
 pretokenized_doc = [
   ['Hello', '!'],
   ['This', 'is', 'Trankit', '.']
@@ -59,6 +63,10 @@ The output will look the same as in the untokenized case, except that now we don
 To enable the NER module to work with sentence-level instead of document-level inputs, we can set the tag `is_sent=True`:
 ### Untokenized input
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
 sent_text = 'This is Trankit.'
 
 tagged_sent = p.ner(sent_text, is_sent=True)
@@ -66,6 +74,10 @@ tagged_sent = p.ner(sent_text, is_sent=True)
 
 ### Pretokenized input
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
 pretokenized_sent = ['This', 'is', 'Trankit', '.']
 
 tagged_sent = p.ner(pretokenized_sent, is_sent=True)

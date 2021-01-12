@@ -20,14 +20,14 @@ from trankit import Pipeline
 
 p = Pipeline('english', gpu=False)
 ```
-Another tag that we can use is `cache_dir`. By default, *Trankit* would check if the pretrained files exist. If they don't, it would download all pretrained files including the shared XLMR-related files and the separate language-related files, then store them to `./cache/trankit`. However, we can change this by changing the tag `cache_dir`:
+Another tag that we can use is `cache_dir`. By default, *Trankit* would check if the pretrained model files exist. If they don't, it would download all pretrained files including the shared XLMR-related files and the separate language-related files, then store them to `./cache/trankit`. However, we can change this by setting the tag `cache_dir`:
 ```python
 from trankit import Pipeline
 
 p = Pipeline('english', cache_dir='./path-to-your-desired-location/')
 ```
 ### Multilingual usage
-Processing multilingual inputs is easy and effective with *Trankit*. For example, to initilize a pipeline that can process inputs in the 3 languages English, Chinese, and Arabic, we can do as follows:
+Processing multilingual inputs is easy and effective with *Trankit*. For example, to initilize a pipeline that can process inputs of the 3 languages English, Chinese, and Arabic, we can do as follows:
 ```python
 from trankit import Pipeline
 
@@ -44,7 +44,7 @@ p = Pipeline('english')
 # Downloading: 100%|██| 5.07M/5.07M [00:00<00:00, 9.28MB/s]
 # http://nlp.uoregon.edu/download/trankit/english.zip
 # Downloading: 100%|█| 47.9M/47.9M [00:00<00:00, 89.2MiB/s]
-# Loading pretrained XLMR, this may take a while...
+# Loading pretrained XLM-Roberta, this may take a while...
 # Downloading: 100%|███████| 512/512 [00:00<00:00, 330kB/s]
 # Downloading: 100%|██| 1.12G/1.12G [00:14<00:00, 74.8MB/s]
 # Loading tokenizer for english
@@ -106,7 +106,7 @@ doc_text = '''Hello! This is Trankit.'''
 # perform all tasks on the input
 all = p(doc_text)
 ```
-Here, `doc_text` is assumed to be a document. It is first split into multiple sentences, each sentence is in turn split into multiple tokens. For each sentence, *Trankit* performs part-of-speech tagging, morphological feature tagging, dependency parsing, and also named entity recognition (NER) if the pretrained NER model for that language is available. The result of the entire process is stored in the variable `all`, which is a hierarchical native Python dictionary that we can retrieve different types of information at both the document and sentence level. The output would look like this:
+Here, `doc_text` is assumed to be a document. Then, the sentence segmentation and tokenization are then jointly done. For each sentence, *Trankit* performs part-of-speech tagging, morphological feature tagging, dependency parsing, and also named entity recognition (NER) if the pretrained NER model for that language is available. The result of the entire process is stored in the variable `all`, which is a hierarchical native Python dictionary that we can retrieve different types of information at both the document and sentence level. The output would look like this (we use [...] to improve the visualization):
 ```python
 {
   'text': 'Hello! This is Trankit.',  # input string
@@ -195,7 +195,7 @@ print(sent_text[span[0]: span[1]])
 ```  
 
 ## Sentence-level processing
-In many cases, we may want to use *Trankit* to process a sentence instead of a document. This can easily be achieved by setting the tag `is_sent=True`:
+In many cases, we may want to use *Trankit* to process a sentence instead of a document. This can be achieved by setting the tag `is_sent=True`:
 ```python
 sent_text = '''Hello! This is Trankit.'''
 tokens = p(sent_text, is_sent=True)
@@ -226,4 +226,4 @@ The output is now a dictionary with a list of all tokens, instead of a list of s
 }
 ```
 
-For more examples on other functions, please refer to the following sections: [Sentence Segmentation](ssplit.md), [Tokenization](tokenize.md), [Part-of-speech tagging and Dependency parsing](posdep.md), [Lemmatization](lemmatize.md), [Named entity recognition](ner.md), and [Training your own pipeline](training.md).
+For more examples on other functions, please refer to the following sections: [Sentence Segmentation](ssplit.md), [Tokenization](tokenize.md), [Part-of-speech, Morphological tagging and Dependency parsing](posdep.md), [Lemmatization](lemmatize.md), [Named entity recognition](ner.md), and [Building a customized pipeline](training.md).

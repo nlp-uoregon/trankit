@@ -232,7 +232,7 @@ git clone https://github.com/nlp-uoregon/trankit.git
 cd trankit
 pip install -e .
 ```
-This would first clone our github repo and automatically install Trankit.
+This would first clone our github repo and install Trankit.
 
 ### Quick Examples
 

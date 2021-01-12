@@ -48,6 +48,10 @@ For illustration purpose, we only show the first sentence.
 ### Pretokenized input
 Pretokenized inputs are automatically recognized by *Trankit*. The following snippet performs lemmatization on a pretokenized document, which is a list of lists of strings:
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
 pretokenized_doc = [
   ['Hello', '!'],
   ['This', 'is', 'Trankit', '.']
@@ -108,6 +112,10 @@ Lemmatization module also accepts inputs as sentences. This can be done by setti
 ### Untokenized input
 
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
 sent_text = '''This is Trankit.'''
 
 lemmatized_sent = p.lemmatize(sent_text, is_sent=True)
@@ -115,6 +123,12 @@ lemmatized_sent = p.lemmatize(sent_text, is_sent=True)
 
 ### Pretokenized input
 ```python
+from trankit import Pipeline
+
+p = Pipeline('english')
+
+sent_text = '''This is Trankit.'''
+
 pretokenized_sent = ['This', 'is', 'Trankit', '.']
 
 lemmatized_sent = p.lemmatize(pretokenized_sent, is_sent=True)
