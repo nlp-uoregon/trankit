@@ -25,7 +25,7 @@ If you use Trankit in your research or software. Please cite `our following pape
       eprint={2101.03289},
       archivePrefix={arXiv},
       primaryClass={cs.CL}
-}
+
 
 .. toctree::
    :maxdepth: 2
