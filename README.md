@@ -204,14 +204,16 @@ Performance comparison between Trankit and these toolkits on other languages can
 
 We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoregon.edu/trankit
 
-Technical details about Trankit are presented in [our following paper](). Please cite the paper if you use Trankit in your software or research.
+Technical details about Trankit are presented in [our following paper](https://arxiv.org/abs/2101.03289). Please cite the paper if you use Trankit in your software or research.
 
 ```bibtex
-@article{unset,
-  title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing},
-  author={unset},
-  journal={arXiv preprint arXiv:},
-  year={2021}
+@misc{nguyen2021trankit,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
+      author={Minh Nguyen and Viet Lai and Amir Pouran Ben Veyseh and Thien Huu Nguyen},
+      year={2021},
+      eprint={2101.03289},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
 }
 ```
 

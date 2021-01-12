@@ -12,6 +12,21 @@ Trankit's Github Repo is available at: https://github.com/nlp-uoregon/trankit
 
 Trankit's Demo Website is hosted at: http://nlp.uoregon.edu/trankit
 
+Citation
+========
+If you use Trankit in your research or software. Please cite our following paper:
+
+.. code-block:: bibtex
+
+   @misc{nguyen2021trankit,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing},
+      author={Minh Nguyen and Viet Lai and Amir Pouran Ben Veyseh and Thien Huu Nguyen},
+      year={2021},
+      eprint={2101.03289},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+
 .. toctree::
    :maxdepth: 2
    :caption: Introduction
@@ -32,17 +47,3 @@ Trankit's Demo Website is hosted at: http://nlp.uoregon.edu/trankit
    lemmatize
    ner
    training
-
-
-Citation
-========
-
-.. code-block:: bibtex
-
-   @article{unset,
-      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing,
-      author={unset},
-      journal={arXiv preprint},
-      year={2021},
-      url={https://arxiv.org/abs/}
-   }
