@@ -22,7 +22,7 @@ Trankit is a **light-weight Transformer-based Python** Toolkit for multilingual 
 
 <div align="center"><img src="https://raw.githubusercontent.com/nlp-uoregon/trankit/master/docs/source/architecture.jpg" height="300px"/></div>
 
-**Trankit outperforms the current state-of-the-art multilingual toolkit Stanfordnlp (Stanza)** in many tasks over 90 [Universal Dependencies v2.5 treebanks](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105) while still being efficient in memory usage and
+**Trankit outperforms the current state-of-the-art multilingual toolkit Stanfordnlp (Stanza)** in many tasks over 90 [Universal Dependencies v2.5 treebanks of 56 different languages](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105) while still being efficient in memory usage and
 speed, making it *usable for general users*. Below is the performance comparison between Trankit, Stanza and other popular NLP toolkits on Arabic, Chinese, and English.
 
 <table class="tg">
