@@ -3,7 +3,7 @@ Model performance
 Universal Dependencies v2.5
 ---------------------------
 
-The following table shows the performance comparison between Trankit v1.0.0, spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora.
+The following table shows the performance comparison between Trankit v0.3.1, spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora.
 
 +----------------+---------+--------+--------+-------+-------+-------+--------+--------+-------+-------+
 | Treebank       | System  | Tokens | Sents. | Words | UPOS  | XPOS  | UFeats | Lemmas | UAS   | LAS   |
@@ -47,7 +47,7 @@ The following table shows the performance comparison between Trankit v1.0.0, spa
 
 As can be seen from the table, Trankit achieves competitive performance on tokenization, multi-word token expansion, and lemmatization. Importantly, Trankit outperforms other toolkits over all remaining tasks (e.g., POS and morphological tagging) in which the improvement boost is substantial and significant for sentence segmentation and dependency parsing. For example, **English** enjoys a **7.22%** improvement for **sentence segmentation**, a **3.92%** and **4.37%** improvement for UAS and LAS in **dependency parsing**. For **Arabic**, Transit has a remarkable improvement of **16.16%** for **sentence segmentation** while **Chinese** observes **12.31%** and **12.72%** improvement of UAS and LAS for **dependency parsing**.
 
-Next, we show the detailed performance of Trankit v1.0.0 and Stanza v1.1.1 on 90 Universal Dependencies v2.5 treebanks. Over all 90 treebanks, Trankit outperforms the previous state-of-the-art framework Stanza in most of the tasks, particularly for sentence segmentation (+3.24%), POS tagging (+1.44% for UPOS and +1.55% for XPOS), morphological tagging (+1.46%), and dependency parsing (+4.0% for UAS and +5.01% for LAS) while maintaining the competitive performance on tokenization, multiword expansion, and lemmatization.
+Next, we show the detailed performance of Trankit v0.3.1 and Stanza v1.1.1 on 90 Universal Dependencies v2.5 treebanks. Over all 90 treebanks, Trankit outperforms the previous state-of-the-art framework Stanza in most of the tasks, particularly for sentence segmentation (+3.24%), POS tagging (+1.44% for UPOS and +1.55% for XPOS), morphological tagging (+1.46%), and dependency parsing (+4.0% for UAS and +5.01% for LAS) while maintaining the competitive performance on tokenization, multiword expansion, and lemmatization.
 
 +------------------------------+---------+--------+--------+-------+-------+-------+--------+---------+--------+-------+-------+-------+-------+-------+
 | Treebank                     | System  | Tokens | Sents. | Words |  UPOS |  XPOS | UFeats | AllTags | Lemmas |   UAS |   LAS |  CLAS |  MLAS |  BLEX |
@@ -422,10 +422,10 @@ Performance for Stanza, UDPipe, and spaCy is obtained using their public pretrai
 Named Entity Recognition
 ---------------------------
 
-Performance comparison between Trankit v1.0.0 and Stanza v1.1.1 on the test sets of 11 public NER datasets. Performance is based on entity micro-averaged F1.
+Performance comparison between Trankit v0.3.1 and Stanza v1.1.1 on the test sets of 11 public NER datasets. Performance is based on entity micro-averaged F1.
 
 +----------+------------+----------------+---------------+
-| Language |     Corpus | Trankit v1.0.0 | Stanza v1.1.1 |
+| Language |     Corpus | Trankit v0.3.1 | Stanza v1.1.1 |
 +----------+------------+----------------+---------------+
 | Arabic   | AQMAR      |           74.8 |          74.3 |
 +----------+------------+----------------+---------------+
