@@ -146,4 +146,4 @@ trainer.train()
 Detailed guidelines for training and loading a customized pipeline can be found [here](https://trankit.readthedocs.io/en/latest/training.html) 
 
 ### Acknowledgements
-We use the [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza).
+We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza).
