@@ -126,7 +126,7 @@ ar = p.ner('وكان كنعان قبل ذلك رئيس جهاز الامن وا�
 ```
 In this example, `.set_active()` is used to switch between languages.
 
-### Building a customized pipeline
+#### Building a customized pipeline
 Training customized pipelines is easy with Trankit via the class `TPipeline`. Below we show how we can train a token and sentence splitter on customized data.
 ```python
 from trankit import TPipeline
