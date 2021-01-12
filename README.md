@@ -17,9 +17,10 @@
         <img alt="Python Versions" src="https://img.shields.io/pypi/pyversions/trankit?colorB=blue">
     </a>
 </div>
+
 Trankit is a **light-weight Transformer-based Python** Toolkit for multilingual Natural Language Processing (NLP). It provides a trainable pipeline for fundamental NLP tasks over [100 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#trainable-languages), and 90 [downloadable](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) pretrained pipelines for [56 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names).
 
-<div align="center"><img src="https://raw.githubusercontent.com/nlp-uoregon/trankit/master/docs/source/architecture.jpg" height="200px"/></div>
+<div align="center"><img src="https://raw.githubusercontent.com/nlp-uoregon/trankit/master/docs/source/architecture.jpg" height="300px"/></div>
 
 **Trankit outperforms the current state-of-the-art multilingual toolkit Stanfordnlp (Stanza)** in many tasks over 90 [Universal Dependencies v2.5 treebanks](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105) while still being efficient in memory usage and
 speed, making it *usable for general users*. Below is the performance comparison between Trankit, Stanza and other popular NLP toolkits on Arabic, Chinese, and English.
