@@ -42,8 +42,8 @@ from trankit import Pipeline
 p = Pipeline('english')
 # Output:
 # Downloading: 100%|██| 5.07M/5.07M [00:00<00:00, 9.28MB/s]
-# http://nlp.uoregon.edu:8000/download/trankit/english.zip
-# Downloading: 100%|█| 38.2M/38.2M [00:00<00:00, 89.2MiB/s]
+# http://nlp.uoregon.edu/download/trankit/english.zip
+# Downloading: 100%|█| 47.9M/47.9M [00:00<00:00, 89.2MiB/s]
 # Loading pretrained XLMR, this may take a while...
 # Downloading: 100%|███████| 512/512 [00:00<00:00, 330kB/s]
 # Downloading: 100%|██| 1.12G/1.12G [00:14<00:00, 74.8MB/s]
@@ -56,8 +56,8 @@ p = Pipeline('english')
 # ==================================================
 
 p.add('chinese')
-# http://nlp.uoregon.edu:8000/download/trankit/chinese.zip
-# Downloading: 100%|█| 40.6M/40.6M [00:00<00:00, 81.3MiB/s]
+# http://nlp.uoregon.edu/download/trankit/chinese.zip
+# Downloading: 100%|█| 40.4M/40.4M [00:00<00:00, 81.3MiB/s]
 # Loading tokenizer for chinese
 # Loading tagger for chinese
 # Loading lemmatizer for chinese
@@ -68,7 +68,7 @@ p.add('chinese')
 # ==================================================
 
 p.add('arabic')
-# http://nlp.uoregon.edu:8000/download/trankit/arabic.zip
+# http://nlp.uoregon.edu/download/trankit/arabic.zip
 # Downloading: 100%|█| 38.6M/38.6M [00:00<00:00, 76.8MiB/s]
 # Loading tokenizer for arabic
 # Loading tagger for arabic
