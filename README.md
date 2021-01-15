@@ -70,7 +70,7 @@ both sentence and document level. Currently, Trankit supports the following task
 - Dependency parsing.
 - Named entity recognition.
 #### Initialize a pretrained pipeline
-The following code shows how to initialize a pretrained pipeline for English; it is instructed to run on GPU, automatically downloaded pretrained models and and store them to the specified cache directory. Trankit will not download pretrained models if they already exist.
+The following code shows how to initialize a pretrained pipeline for English; it is instructed to run on GPU, automatically download pretrained models, and store them to the specified cache directory. Trankit will not download pretrained models if they already exist.
 ```python
 from trankit import Pipeline
 
@@ -79,7 +79,7 @@ p = Pipeline(lang='english', gpu=True, cache_dir='./cache')
 ```
 
 #### Perform all tasks on the input
-After initializing a pretrained pipeline, it can be used to process the inputs on all tasks as shown below. If the input is a sentence, the tag `is_sent` must be set to True. 
+After initializing a pretrained pipeline, it can be used to process the input on all tasks as shown below. If the input is a sentence, the tag `is_sent` must be set to True. 
 ```python
 from trankit import Pipeline
 
@@ -101,8 +101,8 @@ pretokenized_sent = ['This', 'is', 'Trankit', '.']
 processed_sent1 = p(untokenized_sent, is_sent=True)
 processed_sent2 = p(pretokenized_sent, is_sent=True)
 ```
-Note that, although pretokenized inputs can always be processed, using pretokenized inputs for languages that require multi-word token expansion such as Arabic or French might not be the correct way. Please check out the column `Requires MWT expansion` of [this table](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) to see if a particular language requires multi-word token expansion or not.  
-For more detailed examples, please checkout our [documentation page](https://trankit.readthedocs.io/en/latest/overview.html).
+Note that, although pretokenized inputs can always be processed, using pretokenized inputs for languages that require multi-word token expansion such as Arabic or French might not be the correct way. Please check out the column `Requires MWT expansion?` of [this table](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) to see if a particular language requires multi-word token expansion or not.  
+For more detailed examples, please check out our [documentation page](https://trankit.readthedocs.io/en/latest/overview.html).
 
 #### Multilingual usage
 In case we want to process inputs of different languages, we need to initialize a multilingual pipeline.
