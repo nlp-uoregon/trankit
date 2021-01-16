@@ -19,6 +19,7 @@ langwithner = {
     'russian-taiga',
     'spanish',
     'spanish-gsd',
+    'vietnamese',
     'customized-ner',
     'customized-mwt-ner',
 }
@@ -113,7 +114,8 @@ lang2treebank = {
     'ukrainian': 'UD_Ukrainian-IU',
     'urdu': 'UD_Urdu-UDTB',
     'uyghur': 'UD_Uyghur-UDT',
-    'vietnamese': 'UD_Vietnamese-VTB',
+    'vietnamese': 'UD_Vietnamese-VLSP',
+    'vietnamese-vtb': 'UD_Vietnamese-VTB',
     'customized': 'UD_Customized',
     'customized-mwt': 'UD_Customized-MWT',
     'customized-ner': 'UD_Customized-NER',
@@ -150,7 +152,7 @@ tbname2training_id = {"UD_Afrikaans-AfriBooms": 2, "UD_Ancient_Greek-Perseus": 2
                       "UD_Slovenian-SSJ": 2, "UD_Slovenian-SST": 4, "UD_Spanish-AnCora": 1, "UD_Spanish-GSD": 1,
                       "UD_Swedish_Sign_Language-SSLC": 2, "UD_Swedish-LinES": 2, "UD_Swedish-Talbanken": 2,
                       "UD_Tamil-TTB": 1, "UD_Telugu-MTG": 2, "UD_Turkish-IMST": 1, "UD_Ukrainian-IU": 1,
-                      "UD_Upper_Sorbian-UFAL": 4, "UD_Urdu-UDTB": 2, "UD_Uyghur-UDT": 2, "UD_Vietnamese-VTB": 2,
+                      "UD_Upper_Sorbian-UFAL": 4, "UD_Urdu-UDTB": 2, "UD_Uyghur-UDT": 2, "UD_Vietnamese-VTB": 2, 'UD_Vietnamese-VLSP': 2,
                       "UD_Wolof-WTB": 1, 'UD_Customized': 2, 'UD_Customized-MWT': 1, 'UD_Customized-NER': 2, 'UD_Customized-MWT-NER': 1}
 
 tbname2max_input_length = {  # this is for tokenization only
