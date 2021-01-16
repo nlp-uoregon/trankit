@@ -320,7 +320,7 @@ class LemmaWrapper:
         self.config = config
         self.treebank_name = treebank_name
         if evaluate:
-            if self.treebank_name in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB']:
+            if self.treebank_name in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB', 'UD_Vietnamese-VLSP']:
                 self.args = get_identity_lemma_model()
             else:
                 self.model, self.args, self.loaded_args, self.vocab = get_lemma_model(self.config._cache_dir,
@@ -375,7 +375,7 @@ class LemmaWrapper:
         self.config.logger.info('Initialized lemmatizer trainer!')
 
     def train(self):
-        if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB']:
+        if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB', 'UD_Vietnamese-VLSP']:
             print("Training dictionary-based lemmatizer")
             self.config.logger.info("Training dictionary-based lemmatizer")
             self.trainer.train_dict(
@@ -469,7 +469,7 @@ class LemmaWrapper:
             self.config.logger.info('This language does not require lemmatization.')
 
     def predict(self, tagged_doc, obmit_tag):
-        if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB']:
+        if self.treebank_name not in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB', 'UD_Vietnamese-VLSP']:
             vocab = self.vocab
             # load data
             batch = LemmaDataLoader(tagged_doc, self.args['batch_size'], self.loaded_args, vocab=vocab,
