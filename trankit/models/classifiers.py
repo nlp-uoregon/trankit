@@ -130,14 +130,14 @@ class PosDepClassifier(nn.Module):
         diag = torch.eye(batch.head_idxs.size(-1) + 1, dtype=torch.bool).cuda().unsqueeze(0)
         unlabeled_scores.masked_fill_(diag, -float('inf'))
 
-        unlabeled_scores = unlabeled_scores[:, 1:, :]  # exclude attachment for the root symbol
+        unlabeled_scores = unlabeled_scores[:, 1:, :]  
         unlabeled_scores = unlabeled_scores.masked_fill(batch.word_mask.unsqueeze(1), -float('inf'))
         unlabeled_target = batch.head_idxs.masked_fill(batch.word_mask[:, 1:], -100)
         loss += self.criteria(unlabeled_scores.contiguous().view(-1, unlabeled_scores.size(2)),
                               unlabeled_target.view(-1))
         # deprel
         deprel_scores = self.deprel(dep_reprs, dep_reprs)
-        deprel_scores = deprel_scores[:, 1:]  # exclude attachment for the root symbol
+        deprel_scores = deprel_scores[:, 1:]  
         deprel_scores = torch.gather(deprel_scores, 2,
                                      batch.head_idxs.unsqueeze(2).unsqueeze(3).expand(-1, -1, -1, len(
                                          self.vocabs[DEPREL]))).view(

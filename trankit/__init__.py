@@ -2,7 +2,7 @@ from .pipeline import Pipeline
 from .tpipeline import TPipeline
 from .pipeline import supported_langs, langwithner, remove_with_path
 
-__version__ = "0.3.4"
+__version__ = "0.3.5"
 
 
 def verify_customized_pipeline(category, save_dir):
