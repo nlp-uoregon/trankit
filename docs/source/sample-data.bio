@@ -1,531 +1,525 @@
--DOCSTART- -X- O O
+Rare O
+Hendrix I-PER
+song O
+draft O
+sells O
+for O
+almost O
+$ O
+17,000 O
+. O
 
-Rare NNP I-NP O
-Hendrix NNP I-NP I-PER
-song NN I-NP O
-draft NN I-NP O
-sells VBZ I-VP O
-for IN I-PP O
-almost RB I-NP O
-$ $ I-NP O
-17,000 CD I-NP O
-. . O O
+LONDON I-LOC
+1996-08-22 O
 
-LONDON NNP I-NP I-LOC
-1996-08-22 CD I-NP O
+A O
+rare O
+early O
+handwritten O
+draft O
+of O
+a O
+song O
+by O
+U.S. I-LOC
+guitar O
+legend O
+Jimi I-PER
+Hendrix I-PER
+was O
+sold O
+for O
+almost O
+$ O
+17,000 O
+on O
+Thursday O
+at O
+an O
+auction O
+of O
+some O
+of O
+the O
+late O
+musician O
+'s O
+favourite O
+possessions O
+. O
 
-A DT I-NP O
-rare JJ I-NP O
-early JJ I-NP O
-handwritten JJ I-NP O
-draft NN I-NP O
-of IN I-PP O
-a DT I-NP O
-song NN I-NP O
-by IN I-PP O
-U.S. NNP I-NP I-LOC
-guitar NN I-NP O
-legend NN I-NP O
-Jimi NNP I-NP I-PER
-Hendrix NNP I-NP I-PER
-was VBD I-VP O
-sold VBN I-VP O
-for IN I-PP O
-almost RB I-NP O
-$ $ I-NP O
-17,000 CD I-NP O
-on IN I-PP O
-Thursday NNP I-NP O
-at IN I-PP O
-an DT I-NP O
-auction NN I-NP O
-of IN I-PP O
-some DT I-NP O
-of IN I-PP O
-the DT I-NP O
-late JJ I-NP O
-musician NN I-NP O
-'s POS B-NP O
-favourite JJ I-NP O
-possessions NNS I-NP O
-. . O O
+A O
+Florida I-LOC
+restaurant O
+paid O
+10,925 O
+pounds O
+( O
+$ O
+16,935 O
+) O
+for O
+the O
+draft O
+of O
+" O
+Ai I-MISC
+n't I-MISC
+no I-MISC
+telling I-MISC
+" O
+, O
+which O
+Hendrix I-PER
+penned O
+on O
+a O
+piece O
+of O
+London I-LOC
+hotel O
+stationery O
+in O
+late O
+1966 O
+. O
 
-A DT I-NP O
-Florida NNP I-NP I-LOC
-restaurant NN I-NP O
-paid VBD I-VP O
-10,925 CD I-NP O
-pounds NNS I-NP O
-( ( O O
-$ $ I-NP O
-16,935 CD I-NP O
-) ) O O
-for IN I-PP O
-the DT I-NP O
-draft NN I-NP O
-of IN I-PP O
-" " O O
-Ai VBZ I-VP I-MISC
-n't RB O I-MISC
-no DT I-NP I-MISC
-telling VBG I-VP I-MISC
-" " O O
-, , O O
-which WDT I-NP O
-Hendrix NNP B-NP I-PER
-penned VBN I-VP O
-on IN I-PP O
-a DT I-NP O
-piece NN I-NP O
-of IN I-PP O
-London NNP I-NP I-LOC
-hotel NN I-NP O
-stationery NN I-NP O
-in IN I-PP O
-late JJ I-NP O
-1966 CD I-NP O
-. . O O
+At O
+the O
+end O
+of O
+a O
+January O
+1967 O
+concert O
+in O
+the O
+English I-MISC
+city O
+of O
+Nottingham I-LOC
+he O
+threw O
+the O
+sheet O
+of O
+paper O
+into O
+the O
+audience O
+, O
+where O
+it O
+was O
+retrieved O
+by O
+a O
+fan O
+. O
 
-At IN I-PP O
-the DT I-NP O
-end NN I-NP O
-of IN I-PP O
-a DT I-NP O
-January NNP I-NP O
-1967 CD I-NP O
-concert NN I-NP O
-in IN I-PP O
-the DT I-NP O
-English JJ I-NP I-MISC
-city NN I-NP O
-of IN I-PP O
-Nottingham NNP I-NP I-LOC
-he PRP B-NP O
-threw VBD I-VP O
-the DT I-NP O
-sheet NN I-NP O
-of IN I-PP O
-paper NN I-NP O
-into IN I-PP O
-the DT I-NP O
-audience NN I-NP O
-, , O O
-where WRB I-ADVP O
-it PRP I-NP O
-was VBD I-VP O
-retrieved VBN I-VP O
-by IN I-PP O
-a DT I-NP O
-fan NN I-NP O
-. . O O
+Buyers O
+also O
+snapped O
+up O
+16 O
+other O
+items O
+that O
+were O
+put O
+up O
+for O
+auction O
+by O
+Hendrix I-PER
+'s O
+former O
+girlfriend O
+Kathy I-PER
+Etchingham I-PER
+, O
+who O
+lived O
+with O
+him O
+from O
+1966 O
+to O
+1969 O
+. O
 
-Buyers NNS I-NP O
-also RB I-ADVP O
-snapped VBD I-VP O
-up RB I-ADVP O
-16 CD I-NP O
-other JJ I-NP O
-items NNS I-NP O
-that WDT B-NP O
-were VBD I-VP O
-put VBN I-VP O
-up RP I-PRT O
-for IN I-PP O
-auction NN I-NP O
-by IN I-PP O
-Hendrix NNP I-NP I-PER
-'s POS B-NP O
-former JJ I-NP O
-girlfriend NN I-NP O
-Kathy NNP I-NP I-PER
-Etchingham NNP I-NP I-PER
-, , O O
-who WP I-NP O
-lived VBD I-VP O
-with IN I-PP O
-him PRP I-NP O
-from IN I-PP O
-1966 CD I-NP O
-to TO I-PP O
-1969 CD I-NP O
-. . O O
+They O
+included O
+a O
+black O
+lacquer O
+and O
+mother O
+of O
+pearl O
+inlaid O
+box O
+used O
+by O
+Hendrix I-PER
+to O
+store O
+his O
+drugs O
+, O
+which O
+an O
+anonymous O
+Australian I-MISC
+purchaser O
+bought O
+for O
+5,060 O
+pounds O
+( O
+$ O
+7,845 O
+) O
+. O
 
-They PRP I-NP O
-included VBD I-VP O
-a DT I-NP O
-black JJ I-NP O
-lacquer NN I-NP O
-and CC I-NP O
-mother NN I-NP O
-of IN I-PP O
-pearl NN I-NP O
-inlaid VBD I-VP O
-box NN I-NP O
-used VBN I-VP O
-by IN I-PP O
-Hendrix NNP I-NP I-PER
-to TO I-VP O
-store VB I-VP O
-his PRP$ I-NP O
-drugs NNS I-NP O
-, , O O
-which WDT I-NP O
-an DT B-NP O
-anonymous JJ I-NP O
-Australian JJ I-NP I-MISC
-purchaser NN I-NP O
-bought VBD I-VP O
-for IN I-PP O
-5,060 CD I-NP O
-pounds NNS I-NP O
-( ( O O
-$ $ I-NP O
-7,845 CD I-NP O
-) ) O O
-. . O O
+The O
+guitarist O
+died O
+of O
+a O
+drugs O
+overdose O
+in O
+1970 O
+aged O
+27 O
+. O
 
-The DT I-NP O
-guitarist NN I-NP O
-died VBD I-VP O
-of IN I-PP O
-a DT I-NP O
-drugs NNS I-NP O
-overdose NN I-NP O
-in IN I-PP O
-1970 CD I-NP O
-aged VBN I-ADJP O
-27 CD I-NP O
-. . O O
+China I-LOC
+says O
+Taiwan I-LOC
+spoils O
+atmosphere O
+for O
+talks O
+. O
 
--DOCSTART- -X- O O
+BEIJING I-LOC
+1996-08-22 O
 
-China NNP I-NP I-LOC
-says VBZ I-VP O
-Taiwan NNP I-NP I-LOC
-spoils VBZ I-VP O
-atmosphere NN I-NP O
-for IN I-PP O
-talks NNS I-NP O
-. . O O
+China I-LOC
+on O
+Thursday O
+accused O
+Taipei I-LOC
+of O
+spoiling O
+the O
+atmosphere O
+for O
+a O
+resumption O
+of O
+talks O
+across O
+the O
+Taiwan I-LOC
+Strait I-LOC
+with O
+a O
+visit O
+to O
+Ukraine I-LOC
+by O
+Taiwanese I-MISC
+Vice O
+President O
+Lien I-PER
+Chan I-PER
+this O
+week O
+that O
+infuriated O
+Beijing I-LOC
+. O
 
-BEIJING VBG I-VP I-LOC
-1996-08-22 CD I-NP O
+Speaking O
+only O
+hours O
+after O
+Chinese I-MISC
+state O
+media O
+said O
+the O
+time O
+was O
+right O
+to O
+engage O
+in O
+political O
+talks O
+with O
+Taiwan I-LOC
+, O
+Foreign I-ORG
+Ministry I-ORG
+spokesman O
+Shen I-PER
+Guofang I-PER
+told O
+Reuters I-ORG
+: O
+" O
+The O
+necessary O
+atmosphere O
+for O
+the O
+opening O
+of O
+the O
+talks O
+has O
+been O
+disrupted O
+by O
+the O
+Taiwan I-LOC
+authorities O
+. O
+" O
 
-China NNP I-NP I-LOC
-on IN I-PP O
-Thursday NNP I-NP O
-accused VBD I-VP O
-Taipei NNP I-NP I-LOC
-of IN I-PP O
-spoiling VBG I-VP O
-the DT I-NP O
-atmosphere NN I-NP O
-for IN I-PP O
-a DT I-NP O
-resumption NN I-NP O
-of IN I-PP O
-talks NNS I-NP O
-across IN I-PP O
-the DT I-NP O
-Taiwan NNP I-NP I-LOC
-Strait NNP I-NP I-LOC
-with IN I-PP O
-a DT I-NP O
-visit NN I-NP O
-to TO I-PP O
-Ukraine NNP I-NP I-LOC
-by IN I-PP O
-Taiwanese NNP I-NP I-MISC
-Vice NNP I-NP O
-President NNP I-NP O
-Lien NNP I-NP I-PER
-Chan NNP I-NP I-PER
-this DT B-NP O
-week NN I-NP O
-that WDT B-NP O
-infuriated VBD I-VP O
-Beijing NNP I-NP I-LOC
-. . O O
+State O
+media O
+quoted O
+China I-LOC
+'s O
+top O
+negotiator O
+with O
+Taipei I-LOC
+, O
+Tang I-PER
+Shubei I-PER
+, O
+as O
+telling O
+a O
+visiting O
+group O
+from O
+Taiwan I-LOC
+on O
+Wednesday O
+that O
+it O
+was O
+time O
+for O
+the O
+rivals O
+to O
+hold O
+political O
+talks O
+. O
 
-Speaking VBG I-VP O
-only JJ I-ADVP O
-hours NNS I-NP O
-after IN I-PP O
-Chinese JJ I-NP I-MISC
-state NN I-NP O
-media NNS I-NP O
-said VBD I-VP O
-the DT I-NP O
-time NN I-NP O
-was VBD I-VP O
-right RB I-ADJP O
-to TO I-VP O
-engage VB I-VP O
-in IN I-PP O
-political JJ I-NP O
-talks NNS I-NP O
-with IN I-PP O
-Taiwan NNP I-NP I-LOC
-, , O O
-Foreign NNP I-NP I-ORG
-Ministry NNP I-NP I-ORG
-spokesman NN I-NP O
-Shen NNP I-NP I-PER
-Guofang NNP I-NP I-PER
-told VBD I-VP O
-Reuters NNP I-NP I-ORG
-: : O O
-" " O O
-The DT I-NP O
-necessary JJ I-NP O
-atmosphere NN I-NP O
-for IN I-PP O
-the DT I-NP O
-opening NN I-NP O
-of IN I-PP O
-the DT I-NP O
-talks NNS I-NP O
-has VBZ I-VP O
-been VBN I-VP O
-disrupted VBN I-VP O
-by IN I-PP O
-the DT I-NP O
-Taiwan NNP I-NP I-LOC
-authorities NNS I-NP O
-. . O O
-" " O O
+" O
+Now O
+is O
+the O
+time O
+for O
+the O
+two O
+sides O
+to O
+engage O
+in O
+political O
+talks O
+... O
 
-State NN I-NP O
-media NNS I-NP O
-quoted VBD I-VP O
-China NNP I-NP I-LOC
-'s POS B-NP O
-top JJ I-NP O
-negotiator NN I-NP O
-with IN I-PP O
-Taipei NNP I-NP I-LOC
-, , O O
-Tang NNP I-NP I-PER
-Shubei NNP I-NP I-PER
-, , O O
-as IN I-PP O
-telling VBG I-VP O
-a DT I-NP O
-visiting JJ I-NP O
-group NN I-NP O
-from IN I-PP O
-Taiwan NNP I-NP I-LOC
-on IN I-PP O
-Wednesday NNP I-NP O
-that IN I-SBAR O
-it PRP I-NP O
-was VBD I-VP O
-time NN I-NP O
-for IN I-PP O
-the DT I-NP O
-rivals NNS I-NP O
-to TO I-VP O
-hold VB I-VP O
-political JJ I-NP O
-talks NNS I-NP O
-. . O O
+that O
+is O
+to O
+end O
+the O
+state O
+of O
+hostility O
+, O
+" O
+Thursday O
+'s O
+overseas O
+edition O
+of O
+the O
+People I-ORG
+'s I-ORG
+Daily I-ORG
+quoted O
+Tang I-PER
+as O
+saying O
+. O
 
-" " O O
-Now RB I-ADVP O
-is VBZ I-VP O
-the DT I-NP O
-time NN I-NP O
-for IN I-PP O
-the DT I-NP O
-two CD I-NP O
-sides NNS I-NP O
-to TO I-VP O
-engage VB I-VP O
-in IN I-PP O
-political JJ I-NP O
-talks NNS I-NP O
-... : O O
+The O
+foreign O
+ministry O
+'s O
+Shen I-ORG
+told O
+Reuters I-ORG
+Television I-ORG
+in O
+an O
+interview O
+he O
+had O
+read O
+reports O
+of O
+Tang I-PER
+'s O
+comments O
+but O
+gave O
+no O
+details O
+of O
+why O
+the O
+negotiator O
+had O
+considered O
+the O
+time O
+right O
+for O
+talks O
+with O
+Taiwan I-LOC
+, O
+which O
+Beijing I-LOC
+considers O
+a O
+renegade O
+province O
+. O
 
-that WDT I-NP O
-is VBZ I-VP O
-to TO B-VP O
-end VB I-VP O
-the DT I-NP O
-state NN I-NP O
-of IN I-PP O
-hostility NN I-NP O
-, , O O
-" " O O
-Thursday NNP I-NP O
-'s POS B-NP O
-overseas JJ I-NP O
-edition NN I-NP O
-of IN I-PP O
-the DT I-NP O
-People NNPS I-NP I-ORG
-'s POS B-NP I-ORG
-Daily JJ I-NP I-ORG
-quoted VBN I-VP O
-Tang NNP I-NP I-PER
-as IN I-PP O
-saying VBG I-VP O
-. . O O
+China I-LOC
+, O
+which O
+has O
+long O
+opposed O
+all O
+Taipei I-LOC
+efforts O
+to O
+gain O
+greater O
+international O
+recognition O
+, O
+was O
+infuriated O
+by O
+a O
+visit O
+to O
+Ukraine I-LOC
+this O
+week O
+by O
+Taiwanese I-MISC
+Vice O
+President O
+Lien I-PER
+. O
 
-The DT I-NP O
-foreign JJ I-NP O
-ministry NN I-NP O
-'s POS B-NP O
-Shen NNP I-NP I-ORG
-told VBD I-VP O
-Reuters NNP I-NP I-ORG
-Television NNP I-NP I-ORG
-in IN I-PP O
-an DT I-NP O
-interview NN I-NP O
-he PRP B-NP O
-had VBD I-VP O
-read VBN I-VP O
-reports NNS I-NP O
-of IN I-PP O
-Tang NNP I-NP I-PER
-'s POS B-NP O
-comments NNS I-NP O
-but CC O O
-gave VBD I-VP O
-no DT I-NP O
-details NNS I-NP O
-of IN I-PP O
-why WRB I-ADVP O
-the DT I-NP O
-negotiator NN I-NP O
-had VBD I-VP O
-considered VBN I-VP O
-the DT I-NP O
-time NN I-NP O
-right RB I-ADVP O
-for IN I-PP O
-talks NNS I-NP O
-with IN I-PP O
-Taiwan NNP I-NP I-LOC
-, , O O
-which WDT I-NP O
-Beijing NNP B-NP I-LOC
-considers VBZ I-VP O
-a DT I-NP O
-renegade NN I-NP O
-province NN I-NP O
-. . O O
+China I-LOC
+says O
+time O
+right O
+for O
+Taiwan I-LOC
+talks O
+. O
 
-China NNP I-NP I-LOC
-, , O O
-which WDT I-NP O
-has VBZ I-VP O
-long RB I-VP O
-opposed VBN I-VP O
-all DT I-NP O
-Taipei NNP I-NP I-LOC
-efforts NNS I-NP O
-to TO I-VP O
-gain VB I-VP O
-greater JJR I-NP O
-international JJ I-NP O
-recognition NN I-NP O
-, , O O
-was VBD I-VP O
-infuriated VBN I-VP O
-by IN I-PP O
-a DT I-NP O
-visit NN I-NP O
-to TO I-PP O
-Ukraine NNP I-NP I-LOC
-this DT B-NP O
-week NN I-NP O
-by IN I-PP O
-Taiwanese NNP I-NP I-MISC
-Vice NNP I-NP O
-President NNP I-NP O
-Lien NNP I-NP I-PER
-. . O O
+BEIJING I-LOC
+1996-08-22 O
 
--DOCSTART- -X- O O
+China I-LOC
+has O
+said O
+it O
+was O
+time O
+for O
+political O
+talks O
+with O
+Taiwan I-LOC
+and O
+that O
+the O
+rival O
+island O
+should O
+take O
+practical O
+steps O
+towards O
+that O
+goal O
+. O
 
-China NNP I-NP I-LOC
-says VBZ I-VP O
-time NN I-NP O
-right RB I-ADVP O
-for IN I-PP O
-Taiwan NNP I-NP I-LOC
-talks NNS I-NP O
-. . O O
-
-BEIJING VBG I-VP I-LOC
-1996-08-22 CD I-NP O
-
-China NNP I-NP I-LOC
-has VBZ I-VP O
-said VBD I-VP O
-it PRP I-NP O
-was VBD I-VP O
-time NN I-NP O
-for IN I-PP O
-political JJ I-NP O
-talks NNS I-NP O
-with IN I-PP O
-Taiwan NNP I-NP I-LOC
-and CC O O
-that IN I-SBAR O
-the DT I-NP O
-rival JJ I-NP O
-island NN I-NP O
-should MD I-VP O
-take VB I-VP O
-practical JJ I-NP O
-steps NNS I-NP O
-towards IN I-PP O
-that DT I-NP O
-goal NN I-NP O
-. . O O
-
-Consultations NNS I-NP O
-should MD I-VP O
-be VB I-VP O
-held VBN I-VP O
-to TO B-VP O
-set VB I-VP O
-the DT I-NP O
-time NN I-NP O
-and CC I-NP O
-format NN I-NP O
-of IN I-PP O
-the DT I-NP O
-talks NNS I-NP O
-, , O O
-the DT I-NP O
-official NN I-NP O
-Xinhua NNP I-NP I-ORG
-news NN I-NP O
-agency NN I-NP O
-quoted VBN I-VP O
-Tang NNP I-NP I-PER
-Shubei NNP I-NP I-PER
-, , O O
-executive JJ I-NP O
-vice NN I-NP O
-chairman NN I-NP O
-of IN I-PP O
-the DT I-NP O
-Association NNP I-NP I-ORG
-for IN I-PP I-ORG
-Relations NNP I-NP I-ORG
-Across IN I-PP I-ORG
-the DT I-NP I-ORG
-Taiwan NNP I-NP I-ORG
-Straits NNP I-NP I-ORG
-, , O O
-as IN I-PP O
-saying VBG I-VP O
-late RB I-NP O
-on RB I-ADVP O
-Wednesday NNP I-NP O
-. . O O
+Consultations O
+should O
+be O
+held O
+to O
+set O
+the O
+time O
+and O
+format O
+of O
+the O
+talks O
+, O
+the O
+official O
+Xinhua I-ORG
+news O
+agency O
+quoted O
+Tang I-PER
+Shubei I-PER
+, O
+executive O
+vice O
+chairman O
+of O
+the O
+Association I-ORG
+for I-ORG
+Relations I-ORG
+Across I-ORG
+the I-ORG
+Taiwan I-ORG
+Straits I-ORG
+, O
+as O
+saying O
+late O
+on O
+Wednesday O
+. O
 

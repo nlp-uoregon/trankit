@@ -49,7 +49,8 @@ Trankit can be easily installed via one of the following methods:
 ```
 pip install trankit
 ```
-The command would install Trankit and all dependent packages automatically.
+The command would install Trankit and all dependent packages automatically. 
+Note that, due to [this issue](https://github.com/nlp-uoregon/trankit/issues/3) relating to `adapter-transformers`, users may need to uninstall `transformers` before installing trankit.
 
 #### From source
 ```
