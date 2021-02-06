@@ -90,6 +90,8 @@ trainer.train()
 ```
 
 ### Training a named entity recognizer
+Training data for a named entity recognizer should be in the BIO format in which the first column contains the words and the last column contains the BIO annotations. Users can refer to [this file](https://github.com/nlp-uoregon/trankit/tree/master/docs/source/sample-data.bio) to get the sample data in the required format.
+
 ```python
 import trankit
 
