@@ -109,6 +109,7 @@ trainer = trankit.TPipeline(
 # start training
 trainer.train()
 `````
+A colab tutorial on how to train, evaluate, and use a custom NER model is also available [here](https://github.com/nlp-uoregon/trankit/blob/master/examples/colab/trankit_ner_GermEval14.ipynb). Thanks [@mrshu](https://github.com/mrshu) for contributing this to Trankit.
 
 ## Loading
 After the training steps, we need to verify that all the models of our customized pipeline are trained. The following code shows how to do it:
