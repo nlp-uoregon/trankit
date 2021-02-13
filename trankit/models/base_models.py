@@ -40,7 +40,7 @@ class Base_Model(nn.Module):
         idxs = piece_idxs.new(idxs).unsqueeze(-1).expand(batch_size, -1, self.xlmr_dim) + 1
         masks = xlmr_outputs.new(masks).unsqueeze(-1)
         xlmr_outputs = torch.gather(xlmr_outputs, 1,
-                                    idxs) * masks  # this might cause non-deterministic results during training, consider using `compute_word_reps_avg` in that case
+                                    idxs) * masks  
         xlmr_outputs = xlmr_outputs.view(batch_size, token_num, token_len, self.xlmr_dim)
         xlmr_outputs = xlmr_outputs.sum(2)
         return xlmr_outputs, cls_reprs
