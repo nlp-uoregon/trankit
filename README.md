@@ -29,16 +29,14 @@ In particular, for **English**, **Trankit is significantly better than Stanza** 
 
 We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoregon.edu/trankit
 
-Technical details about Trankit are presented in [our following paper](https://arxiv.org/pdf/2101.03289.pdf). Please cite the paper if you use Trankit in your research.
+[Our technical paper](https://arxiv.org/pdf/2101.03289.pdf) for Trankit will be presented at the EACL 2021 conference as a demonstration. Please cite the paper if you use Trankit in your research.
 
 ```bibtex
-@misc{nguyen2021trankit,
+@inproceedings{nguyen2021trankit,
       title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
       author={Minh Nguyen and Viet Lai and Amir Pouran Ben Veyseh and Thien Huu Nguyen},
-      year={2021},
-      eprint={2101.03289},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
+      year={2021}
 }
 ```
 
