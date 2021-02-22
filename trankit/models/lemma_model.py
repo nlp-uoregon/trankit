@@ -57,7 +57,7 @@ def set_lemma(doc, preds, obmit_tag=None, training_mode=False):
         return doc
 
 
-class Trainer(object):
+class Trainer:
     """ A trainer for training models. """
 
     def __init__(self, args=None, vocab=None, emb_matrix=None, model_file=None, use_cuda=False, training_mode=False):

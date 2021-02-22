@@ -10,7 +10,7 @@ from trankit.utils.mwt_lemma_utils.mwt_utils import get_mwt_expansions, set_mwt_
 from ..utils.base_utils import *
 
 
-class Trainer(object):
+class Trainer:
     """ A trainer for training models. """
 
     def __init__(self, args=None, vocab=None, emb_matrix=None, model_file=None, use_cuda=False, training_mode=False):
