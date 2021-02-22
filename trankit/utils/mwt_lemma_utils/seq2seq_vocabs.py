@@ -203,7 +203,7 @@ class BaseMultiVocab:
         if vocab_dict is None:
             return
         # check all values provided must be a subclass of the Vocab base class
-        assert all([isinstance(v, BaseVocab) for v in vocab_dict.values()])
+        assert all(isinstance(v, BaseVocab) for v in vocab_dict.values())
         for k, v in vocab_dict.items():
             self._vocabs[k] = v
 
