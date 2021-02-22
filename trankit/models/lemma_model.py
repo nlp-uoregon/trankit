@@ -169,7 +169,6 @@ class Trainer:
                 self.composite_dict[(w, pos)] = l
             if w not in self.word_dict:
                 self.word_dict[w] = l
-        return
 
     def predict_dict(self, pairs):
         """ Predict a list of lemmas using the dict model given (word, pos) pairs. """

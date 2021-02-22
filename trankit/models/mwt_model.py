@@ -81,7 +81,6 @@ class Trainer:
             if w not in seen and w != l:
                 self.expansion_dict[w] = l
             seen.add(w)
-        return
 
     def predict_dict(self, words):
         """ Predict a list of expansions given words. """

@@ -317,7 +317,6 @@ def print_config(config):
     for k, v in config.items():
         info += "\t{} : {}\n".format(k, str(v))
     print("\n" + info + "\n")
-    return
 
 
 def normalize_text(text):
