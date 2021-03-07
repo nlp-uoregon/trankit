@@ -1,7 +1,22 @@
+import os, json
 import trankit
 from time import sleep
 
+def is_equal(a, b):
+    with open('a.json', 'w') as f:
+        json.dump(a, f, ensure_ascii=False)
+    with open('b.json', 'w') as f:
+        json.dump(b, f, ensure_ascii=False)
+    with open('a.json') as f:
+        ajson = json.load(f)
+    with open('b.json') as f:
+        bjson = json.load(f)
+    if ajson == bjson: return True
+    return False
+
 p = trankit.Pipeline('english')
+
+os.system('mkdir -p trankit/tests/sample_outputs')
 
 num_passed = 0
 
@@ -12,6 +27,11 @@ for lid, lang in enumerate(trankit.supported_langs):
         text = f.read()
 
     all_doc = p(text)
+    with open('trankit/tests/sample_outputs/{}.json'.format(lang)) as f:
+        sample_output = json.load(f)
+
+    if not is_equal(all_doc, sample_output): continue
+
     all_sent = p(text, is_sent=True)
 
     sents = p.ssplit(text)
@@ -34,9 +54,8 @@ for lid, lang in enumerate(trankit.supported_langs):
         ner2 = p.ner(text, is_sent=True)
         ner3 = p.ner([[w['text'] for w in sent['tokens']] for sent in tokens['sentences']])
         ner4 = p.ner([w['text'] for w in tokens2['tokens']], is_sent=True)
-    print('*' * 30 + ' {}:{}: PASSED '.format(lid, lang) + '*' * 30)
+    print('*' * 30 + ' {}:{}: PASSED '.format(lid + 1, lang) + '*' * 30)
     num_passed += 1
-    sleep(1)
 
 print('=' * 20 + ' SUMMARY ' + '=' * 20)
-print('Total passed: {}'.format(num_passed))
+print('Total passed: {}/{}'.format(num_passed, len(trankit.supported_langs)))
