@@ -235,7 +235,7 @@ def get_adaptive_eval_interval(cur_dev_size, thres_dev_size, base_interval):
 # ud utils
 
 def harmonic_mean(a, weights=None):
-    if any([x == 0 for x in a]):
+    if any(x == 0 for x in a):
         return 0
     else:
         assert weights is None or len(weights) == len(
@@ -317,7 +317,6 @@ def print_config(config):
     for k, v in config.items():
         info += "\t{} : {}\n".format(k, str(v))
     print("\n" + info + "\n")
-    return
 
 
 def normalize_text(text):

@@ -57,7 +57,7 @@ def set_lemma(doc, preds, obmit_tag=None, training_mode=False):
         return doc
 
 
-class Trainer(object):
+class Trainer:
     """ A trainer for training models. """
 
     def __init__(self, args=None, vocab=None, emb_matrix=None, model_file=None, use_cuda=False, training_mode=False):
@@ -169,7 +169,6 @@ class Trainer(object):
                 self.composite_dict[(w, pos)] = l
             if w not in self.word_dict:
                 self.word_dict[w] = l
-        return
 
     def predict_dict(self, pairs):
         """ Predict a list of lemmas using the dict model given (word, pos) pairs. """

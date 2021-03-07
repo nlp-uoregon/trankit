@@ -227,7 +227,7 @@ class LSTMAttention(nn.Module):
         return output, hidden
 
 
-class Beam(object):
+class Beam:
     """
      Adapted and modified from the OpenNMT project.
 
