@@ -3,7 +3,22 @@ Model performance
 Universal Dependencies v2.5
 ---------------------------
 
-The following table shows the performance comparison between Trankit, spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora.
+The following table shows the performance comparison between Trankit, spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora. Performance for each model are F1 scores obtained by using the `official evaluation script <https://universaldependencies.org/conll18/evaluation.html>`_ of the CoNLL 2018 Shared Task. The meanings of the columns in the following tables are provided by the evaluation script as follows:
+
+* Tokens: how well do the gold tokens match system tokens
+* Sentences: how well do the gold sentences match system sentences
+* Words: how well can the gold words be aligned to system words
+* UPOS: using aligned words, how well does UPOS match
+* XPOS: using aligned words, how well does XPOS match
+* UFeats: using aligned words, how well does universal FEATS match
+* AllTags: using aligned words, how well does UPOS+XPOS+FEATS match
+* Lemmas: using aligned words, how well does LEMMA match
+* UAS: using aligned words, how well does HEAD match
+* LAS: using aligned words, how well does HEAD+DEPREL(ignoring subtypes) match
+* CLAS: using aligned words with content DEPREL, how well does HEAD+DEPREL(ignoring subtypes) match
+* MLAS: using aligned words with content DEPREL, how well does HEAD+DEPREL(ignoring subtypes)+UPOS+UFEATS+FunctionalChildren(DEPREL+UPOS+UFEATS) match
+* BLEX: using aligned words with content DEPREL, how well does HEAD+DEPREL(ignoring subtypes)+LEMMAS match
+
 
 +----------------+---------+--------+--------+-------+-------+-------+--------+--------+-------+-------+
 | Treebank       | System  | Tokens | Sents. | Words | UPOS  | XPOS  | UFeats | Lemmas | UAS   | LAS   |
