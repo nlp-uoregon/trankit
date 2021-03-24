@@ -57,7 +57,7 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['numpy', 'protobuf', 'requests', 'torch>=1.6.0', 'tqdm', 'adapter-transformers==1.0.1'],
+    install_requires=['numpy', 'protobuf', 'requests', 'torch>=1.6.0,<1.8.0', 'tqdm', 'adapter-transformers==1.0.1'],
     entry_points={
     },
 )
