@@ -18,13 +18,12 @@ If you use Trankit in your research or software. Please cite `our following pape
 
 .. code-block:: bibtex
 
-   @misc{nguyen2021trankit,
-      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing},
-      author={Minh Nguyen and Viet Lai and Amir Pouran Ben Veyseh and Thien Huu Nguyen},
-      year={2021},
-      eprint={2101.03289},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+   @inproceedings{nguyen2021trankit,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
+      author={Minh Van Nguyen, Viet Lai, Amir Pouran Ben Veyseh and Thien Huu Nguyen},
+      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
+      year={2021}
+   }
 
 
 .. toctree::
