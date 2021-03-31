@@ -1,5 +1,8 @@
 Model performance
 =================
+
+**News**: Trankit v1.0.0 is out. The new version has pretrained pipelines using XLM-Roberta Large which is much better than our previous version with XLM-Roberta Base. Checkout the performance comparison below on this page. Trankit v1.0.0 also provides a brand new `command-line interface <https://trankit.readthedocs.io/en/latest/commandline.html>`_ that helps users who are not familiar with Python can use Trankit more easily. Finally, the new version has a brand new `Auto Mode <https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines>`_ in which a language detector is used to activate the language-specific models for processing the input, avoiding switching back and forth between languages in a multilingual pipeline.
+
 Universal Dependencies v2.5
 ---------------------------
 

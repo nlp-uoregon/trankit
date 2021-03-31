@@ -18,6 +18,14 @@
     </a>
 </div>
 
+### :boom: :boom: :boom: Trankit v1.0.0 is out
+
+* 90 new pretrained transformer-based pipelines for 56 languages. The new pipelines are trained with XLM-Roberta large, which further boosts the performance significantly over 90 treebanks of the Universal Dependencies v2.5 corpus. Check out the new performance [here](https://trankit.readthedocs.io/en/latest/performance.html). This [page](https://trankit.readthedocs.io/en/latest/news.html#trankit-large) shows you how to use the new pipelines.
+
+* Auto Mode for multilingual pipelines. In the Auto Mode, the language of the input will be automatically detected, enabling the multilingual pipelines to process the input without specifying its language. Check out how to turn on the Auto Mode [here](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Thank you [loretoparisi](https://github.com/loretoparisi) for your suggestion on this.
+
+* Command-line interface is now available to use. This helps users who are not familiar with Python programming language can use Trankit easily. Check out the tutorials on this [page](https://trankit.readthedocs.io/en/latest/commandline.html).
+
 Trankit is a **light-weight Transformer-based Python** Toolkit for multilingual Natural Language Processing (NLP). It provides a trainable pipeline for fundamental NLP tasks over [100 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#trainable-languages), and 90 [downloadable](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) pretrained pipelines for [56 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names).
 
 <div align="center"><img src="https://raw.githubusercontent.com/nlp-uoregon/trankit/master/docs/source/architecture.jpg" height="300px"/></div>
@@ -148,4 +156,4 @@ Detailed guidelines for training and loading a customized pipeline can be found 
 - Language Identification
 
 ### Acknowledgements
-We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza).
+We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza). To implement the language detection module, we leverage the [langid](https://github.com/saffsd/langid.py) library.

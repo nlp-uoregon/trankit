@@ -58,7 +58,7 @@ In this way, we are guaranteed that the detected language can only be one of the
 ```python
 p.set_auto(False)
 ```
-After this, our multilingual pipeline can be used in the manual mode where we can manually set a particular language active. As a final note, we use [langid](https://github.com/saffsd/langid.py) to perform language detection. The detected language for each input can be inspected by accessing the field `"lang"` of the output.
+After this, our multilingual pipeline can be used in the manual mode where we can manually set a particular language active. As a final note, we use [langid](https://github.com/saffsd/langid.py) to perform language detection. The detected language for each input can be inspected by accessing the field `"lang"` of the output. Thank you [loretoparisi](https://github.com/loretoparisi) for your suggestion on this.
 
 ### Command-line interface
 Starting from version v1.0.0, Trankit supports processing text via command-line interface. This helps users who are not familiar with Python programming language can use Trankit more easily. Please check out [this page](https://trankit.readthedocs.io/en/latest/commandline.html) for tutorials and examples.
