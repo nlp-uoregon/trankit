@@ -69,7 +69,7 @@ def process_a_file(input_fpath, input_format, output_dir, pipeline, task):
         assert task == 'pall'
         output = pipeline(task_input)
 
-    with open(os.path.join(output_dir, os.path.basename(input_fpath) + '.processed.json'), 'w') as f:
+    with open(os.path.join(output_dir, os.path.basename(input_fpath) + '.{}.json'.format(task)), 'w') as f:
         json.dump(output, f, ensure_ascii=False)
 
 
