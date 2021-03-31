@@ -2,6 +2,12 @@
 
 What's new in Trankit v1.0.0? Let's check out below.
 
+### Installation
+
+```
+pip install trankit==1.0.0
+```
+
 ### Trankit large
 Starting from version 1.0.0, Trankit supports using XLM-Roberta large as the multilingual embedding (i.e., Trankit large), which further boosts the performance over 90 Universal Dependencies treebanks. The usage of the large version is the same as before except that users need to specify the embedding for pipeline initialization. Below is an example for initializing a monolingual and multilingual pipeline.
 
