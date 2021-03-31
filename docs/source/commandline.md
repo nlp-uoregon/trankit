@@ -35,11 +35,17 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Example use:
     
-    -Monolingual case: `python -m trankit [other options] --lang english`
+    -Monolingual case:
     
-    -Multilingual case with 3 languages: `python -m trankit [other options] --lang english,chinese,arabic`
+        python -m trankit [other options] --lang english
     
-    -Multilingual case with all supported languages: `python -m trankit [other options] --lang auto`
+    -Multilingual case with 3 languages:
+    
+        python -m trankit [other options] --lang english,chinese,arabic
+    
+    -Multilingual case with all supported languages:
+    
+        python -m trankit [other options] --lang auto
     
     In multilingual mode, trankit will automatically detect the language of the input file(s) to use corresponding models.
     
@@ -49,7 +55,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Forcing trankit to run on CPU. Default: False.Example use:
     
-    `python -m trankit [other options] --cpu`
+        python -m trankit [other options] --cpu
 
 * `--embedding`
     
@@ -57,17 +63,21 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Example use:
     
-    -XLM-Roberta base: `python -m trankit [other options] --embedding xlm-roberta-base`
+    -XLM-Roberta base:
+        
+        python -m trankit [other options] --embedding xlm-roberta-base
     
-    -XLM-Roberta large: `python -m trankit [other options] --embedding xlm-roberta-large`
+    -XLM-Roberta large:
+        
+        python -m trankit [other options] --embedding xlm-roberta-large
     
 * `--cache_dir`
     
-    Location to store downloaded model files. Default: cache/trankit.
+    Location to store downloaded model files. Default: "cache/trankit".
     
     Example use:
     
-    `python -m trankit [other options] --cache_dir your/cache/dir`
+        python -m trankit [other options] --cache_dir your/cache/dir
 
 * `--input`
     
@@ -83,9 +93,13 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Example use:
     
-    -Input is a directory: `python -m trankit [other options] --input some_dir_path`
+    -Input is a directory:
     
-    -Input is a file: `python -m trankit [other options] --input some_file_path`
+        python -m trankit [other options] --input some_dir_path
+    
+    -Input is a file:
+        
+        python -m trankit [other options] --input some_file_path
     
 * `--input_format`
     
@@ -97,11 +111,11 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Location of the output directory to store the processed files. Processed files will be in json format, with the naming convention as follows:
     
-        `processed_file_name = input_file_name + .processed.json`
+        processed_file_name = input_file_name + .processed.json
     
     Example use:
     
-    python -m trankit [other options] --output_dir some_dir_path
+        python -m trankit [other options] --output_dir some_dir_path
 
 * `--task`
     
@@ -111,7 +125,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     -Sentence segmentation, assuming input is a single DOCUMENT string.
     
-       `python -m trankit [other options] --task ssplit`
+        python -m trankit [other options] --task ssplit
     
      Sample input for ssplit: 
      
@@ -119,7 +133,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     -Sentence segmentation + Tokenization, assuming input is a single DOCUMENT string.
     
-       `python -m trankit [other options] --task dtokenize`
+        python -m trankit [other options] --task dtokenize
     
      Sample input for dtokenize: 
      
@@ -127,7 +141,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     -Tokenization only, assuming input contains multiple raw SENTENCE strings in each line.
     
-       python -m trankit [other options] --task stokenize
+        python -m trankit [other options] --task stokenize
     
      Sample input for stokenize: 
      
@@ -157,7 +171,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
      
-       `python -m trankit [other options] --task pposdep`
+       python -m trankit [other options] --task pposdep
      
      Sample input for dposdep: 
      
@@ -166,7 +180,8 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     -Sentence segmentation, Tokenization, Lemmatization
      
      Assuming input is a single DOCUMENT string.
-       `python -m trankit [other options] --task dlemmatize`
+     
+       python -m trankit [other options] --task dlemmatize
        
      Sample input for dposdep: 
      
@@ -176,7 +191,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains multiple raw SENTENCE strings in each line.
        
-       `python -m trankit [other options] --task slemmatize`
+       python -m trankit [other options] --task slemmatize
      
      Sample input for dposdep: 
      
@@ -186,7 +201,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
        
-       `python -m trankit [other options] --task plemmatize`
+       python -m trankit [other options] --task plemmatize
      
      Sample input for dposdep: 
      
@@ -196,7 +211,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input is a single DOCUMENT string.
       
-       `python -m trankit [other options] --task dner`
+       python -m trankit [other options] --task dner
      
      Sample input for dposdep: 
      
@@ -206,7 +221,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains multiple raw SENTENCE strings in each line.
        
-       `python -m trankit [other options] --task sner`
+       python -m trankit [other options] --task sner
      
      Sample input for dposdep: [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
     
@@ -214,7 +229,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
        
-       `python -m trankit [other options] --task pner`
+       python -m trankit [other options] --task pner
      
      Sample input for dposdep: 
      
@@ -224,7 +239,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Assuming input is a single DOCUMENT string.
        
-       `python -m trankit [other options] --task dall`
+       python -m trankit [other options] --task dall
      
      Sample input for dposdep: 
      
@@ -234,7 +249,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
      
      Assuming input contains multiple raw SENTENCE strings in each line.
        
-       `python -m trankit [other options] --task sall`
+       python -m trankit [other options] --task sall
      
      Sample input for dposdep: 
      
@@ -242,7 +257,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     -Part-of-speech tagging, Morphological tagging, Dependency parsing, Named Entity Recognition.
        
-       `python -m trankit [other options] --task pall`
+       python -m trankit [other options] --task pall
      
      Sample input for dposdep: 
      
