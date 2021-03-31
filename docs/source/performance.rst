@@ -3,7 +3,7 @@ Model performance
 Universal Dependencies v2.5
 ---------------------------
 
-The following table shows the performance comparison between `Trankit large <>`_ (using XLM-Roberta large) and base (using XLM-Roberta base), spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora. Performance for each model are F1 scores obtained by using the `official evaluation script <https://universaldependencies.org/conll18/evaluation.html>`_ of the CoNLL 2018 Shared Task. The meanings of the columns in the following tables are provided by the evaluation script as follows:
+The following table shows the performance comparison between `Trankit large <https://trankit.readthedocs.io/en/latest/news.html#trankit-large>`_ (using XLM-Roberta large) and base (using XLM-Roberta base), spaCy v2.3, UDPipe v1.2, and Stanza v1.1.1 on the test treebanks of the 5 major languages on the `Universal Dependencies v2.5 <https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-3105>`_ corpora. Performance for each model are F1 scores obtained by using the `official evaluation script <https://universaldependencies.org/conll18/evaluation.html>`_ of the CoNLL 2018 Shared Task. The meanings of the columns in the following tables are provided by the evaluation script as follows:
 
 * **Tokens**: how well do the gold tokens match system tokens.
 * **Sents.**: how well do the gold sentences match system sentences.

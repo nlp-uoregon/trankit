@@ -31,7 +31,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
 
 * `--lang`
     
-    Language(s) of the pipeline to be initialized. Check out this [page]() to see the available language names.
+    Language(s) of the pipeline to be initialized. Check out this [page](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) to see the available language names.
     
     Example use:
     
@@ -116,11 +116,11 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Sample inputs can be found here:
     
-    [plaindoc](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
+    [plaindoc](https://github.com/nlp-uoregon/trankit/blob/master/examples/commandline/plaindoc.txt)
     
-    [plainsen](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
+    [plainsen](https://github.com/nlp-uoregon/trankit/blob/master/examples/commandline/plainsen.txt)
     
-    [pretok](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
+    [pretok](https://github.com/nlp-uoregon/trankit/blob/master/examples/commandline/pretok.txt)
 
 * `--output_dir`
     

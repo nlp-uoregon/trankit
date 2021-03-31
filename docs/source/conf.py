@@ -23,7 +23,7 @@ copyright = '2021, NLP Group at the University of Oregon'
 author = 'NLP Group at the University of Oregon'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.3'
+release = ''
 
 
 # -- General configuration ---------------------------------------------------
