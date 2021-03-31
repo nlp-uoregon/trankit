@@ -32,8 +32,8 @@ If you use Trankit in your research or software. Please cite `our following pape
    :maxdepth: 2
    :caption: Introduction
 
-   installation
    news
+   installation
    overview
    howitworks
    performance
