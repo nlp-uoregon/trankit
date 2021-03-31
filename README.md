@@ -133,6 +133,13 @@ ar = p.ner('وكان كنعان قبل ذلك رئيس جهاز الامن وا�
 ```
 In this example, `.set_active()` is used to switch between languages.
 
+Note that, starting from version v1.0.0, we can turn on the Auto Mode for the multilingual pipeline by:
+
+```python
+p.set_auto(True)
+```
+In this way, we don't have to switch to a specific language before processing the input. More about the Auto Mode is available [here](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines).
+
 #### Building a customized pipeline
 Training customized pipelines is easy with Trankit via the class `TPipeline`. Below we show how we can train a token and sentence splitter on customized data.
 ```python
