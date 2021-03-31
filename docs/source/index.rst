@@ -33,6 +33,7 @@ If you use Trankit in your research or software. Please cite `our following pape
    :caption: Introduction
 
    installation
+   news
    overview
    howitworks
    performance
