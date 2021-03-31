@@ -87,10 +87,6 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     If it is a file, trankit will process the file only.
     
-    The input file(s) can be raw or pretokenized text. Sample input can be found here:
-    
-    [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs)
-    
     Example use:
     
     -Input is a directory:
@@ -103,9 +99,28 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
 * `--input_format`
     
-    Indicating that the input format. Sample input can be found here:
+    Indicating the input format.
     
-    [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs)
+    Case 1: Each input file is a single raw DOCUMENT string:
+        
+        python -m trankit [other options] --input_format plaindoc
+    
+    Case 2: Each input file contains multiple raw SENTENCE strings in each line:
+    
+        python -m trankit [other options] --input_format plainsen
+        
+    Case 3: Each input file contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word:
+    
+        python -m trankit [other options] --input_format pretok
+    
+    
+    Sample inputs can be found here:
+    
+    [plaindoc](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
+    
+    [plainsen](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
+    
+    [pretok](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
 
 * `--output_dir`
     
@@ -123,142 +138,84 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
     
     Use cases:
     
-    -Sentence segmentation, assuming input is a single DOCUMENT string.
+    -Sentence segmentation, assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
     
         python -m trankit [other options] --task ssplit
     
-     Sample input for ssplit: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
-    
-    -Sentence segmentation + Tokenization, assuming input is a single DOCUMENT string.
+    -Sentence segmentation + Tokenization, assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
     
         python -m trankit [other options] --task dtokenize
     
-     Sample input for dtokenize: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
-    
-    -Tokenization only, assuming input contains multiple raw SENTENCE strings in each line.
+    -Tokenization only, assuming each input file contains multiple raw SENTENCE strings in each line (`--input_format plainsen`).
     
         python -m trankit [other options] --task stokenize
     
-     Sample input for stokenize: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
-    
     -Sentence segmentation, Tokenization, Part-of-speech tagging, Morphological tagging, Dependency parsing.
      
-     Assuming input is a single DOCUMENT string.
+     Assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
       
        python -m trankit [other options] --task dposdep
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
     
     -Tokenization only, Part-of-speech tagging, Morphological tagging, Dependency parsing.
      
-     Assuming input contains multiple raw SENTENCE strings in each line.
+     Assuming each input file contains multiple raw SENTENCE strings in each line (`--input_format plainsen`).
      
        python -m trankit [other options] --task sposdep
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
     
     -Part-of-speech tagging, Morphological tagging, Dependency parsing.
      
-     Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
+     Assuming each input file contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word (`--input_format pretok`).
      
        python -m trankit [other options] --task pposdep
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
     
     -Sentence segmentation, Tokenization, Lemmatization
      
-     Assuming input is a single DOCUMENT string.
+     Assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
      
        python -m trankit [other options] --task dlemmatize
-       
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
     
     -Tokenization only, Lemmatization
      
-     Assuming input contains multiple raw SENTENCE strings in each line.
+     Assuming each input file contains multiple raw SENTENCE strings in each line (`--input_format plainsen`).
        
        python -m trankit [other options] --task slemmatize
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
     
     -Lemmatization
      
-     Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
+     Assuming each input file contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word (`--input_format pretok`).
        
        python -m trankit [other options] --task plemmatize
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
     
     -Sentence segmentation, Tokenization, Named Entity Recognition.
      
-     Assuming input is a single DOCUMENT string.
+     Assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
       
        python -m trankit [other options] --task dner
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
     
     -Tokenization only, Named Entity Recognition.
      
-     Assuming input contains multiple raw SENTENCE strings in each line.
+     Assuming each input file contains multiple raw SENTENCE strings in each line (`--input_format plainsen`).
        
        python -m trankit [other options] --task sner
-     
-     Sample input for dposdep: [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
     
     -Named Entity Recognition.
      
-     Assuming input contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word.
+     Assuming each input file contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word (`--input_format pretok`).
        
        python -m trankit [other options] --task pner
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
     
     -Sentence segmentation, Tokenization, Part-of-speech tagging, Morphological tagging, Dependency parsing, Named Entity Recognition.
     
-    Assuming input is a single DOCUMENT string.
+    Assuming each input file is a single raw DOCUMENT string (`--input_format plaindoc`).
        
        python -m trankit [other options] --task dall
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plaindoc.txt)
     
     -Tokenization only, Part-of-speech tagging, Morphological tagging, Dependency parsing, Named Entity Recognition.
      
-     Assuming input contains multiple raw SENTENCE strings in each line.
+     Assuming each input file contains multiple raw SENTENCE strings in each line (`--input_format plainsen`).
        
        python -m trankit [other options] --task sall
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/plainsen.txt)
     
     -Part-of-speech tagging, Morphological tagging, Dependency parsing, Named Entity Recognition.
        
        python -m trankit [other options] --task pall
-     
-     Sample input for dposdep: 
-     
-     [https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt](https://github.com/nlp-uoregon/trankit/tree/master/examples/commandline/sample_inputs/pretok.txt)
