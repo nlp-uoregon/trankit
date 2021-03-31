@@ -14,6 +14,7 @@ def is_equal(a, b):
         ajson = json.load(f)
     with open('b.json') as f:
         bjson = json.load(f)
+    bjson['lang'] = ajson['lang']
     if ajson == bjson: return True
     return False
 
