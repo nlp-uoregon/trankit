@@ -11,7 +11,7 @@ The command would install *Trankit* and all dependent packages automatically.
 
 ## From source
 ```
-git clone https://github.com/minhvannguyen/trankit.git
+git clone https://github.com/nlp-uoregon/trankit
 cd trankit
 pip install -e .
 ```

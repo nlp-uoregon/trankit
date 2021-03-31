@@ -118,13 +118,14 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
                 new_ex[HEAD].append(head)
                 new_ex[DEPREL].append(deprel)
 
-        pieces = [[p for p in wordpiece_splitter.tokenize(w) if p != '▁'] for w in new_ex['words']]
-        flat_pieces = [p for ps in pieces for p in ps]
-        if len(flat_pieces) > max_input_length - 2:
-            skip_num += 1
-            continue
-        else:
-            examples.append(new_ex)
+        # pieces = [[p for p in wordpiece_splitter.tokenize(w) if p != '▁'] for w in new_ex['words']]
+        # flat_pieces = [p for ps in pieces for p in ps]
+        # if len(flat_pieces) > max_input_length - 2:
+        #     skip_num += 1
+        #     continue
+        # else:
+        #     examples.append(new_ex)
+        examples.append(new_ex)
     return examples, conllu_doc
 
 

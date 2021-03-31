@@ -120,6 +120,11 @@ class TPipeline:
         # empty cache
         torch.cuda.empty_cache()
 
+        # set embedding name
+        master_config.embedding_name = 'xlm-roberta-base' if 'embedding' not in training_config else training_config['embedding']
+        assert master_config.embedding_name in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
+            master_config.embedding_name, supported_embeddings)
+
         # lang and data
         self._lang = training_config['category'] if 'category' in training_config else 'customized'
         self._task = training_config['task']
@@ -205,10 +210,10 @@ class TPipeline:
 
         # wordpiece splitter
         if self._task not in ['mwt', 'lemmatize']:
-            master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base',
+            master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
                                                                                    cache_dir=os.path.join(
                                                                                        master_config._save_dir,
-                                                                                       'xlmr'))
+                                                                                       master_config.embedding_name))
 
     def _prepare_tokenize(self):
         self.train_set = TokenizeDataset(
@@ -295,7 +300,7 @@ class TPipeline:
         self.dev_set = NERDataset(
             config=self._config,
             bio_fpath=self._dev_bio_fpath,
-            evaluate=False
+            evaluate=True
         )
         self.dev_set.numberize()
         self.dev_batch_num = len(self.dev_set) // self._config.batch_size + \

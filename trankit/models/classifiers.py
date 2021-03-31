@@ -9,7 +9,7 @@ class NERClassifier(nn.Module):
     def __init__(self, config, language):
         super().__init__()
         self.config = config
-        self.xlmr_dim = 768
+        self.xlmr_dim = 768 if config.embedding_name == 'xlm-roberta-base' else 1024
         self.entity_label_stoi = config.ner_vocabs[language]  # BIOES tags
         self.entity_label_itos = {i: s for s, i in self.entity_label_stoi.items()}
         self.entity_label_num = len(self.entity_label_stoi)
@@ -25,7 +25,7 @@ class NERClassifier(nn.Module):
         if not config.training:
             # load pretrained weights
             self.initialized_weights = self.state_dict()
-            self.pretrained_ner_weights = torch.load(os.path.join(self.config._cache_dir, language,
+            self.pretrained_ner_weights = torch.load(os.path.join(self.config._cache_dir, self.config.embedding_name, language,
                                                                   '{}.ner.mdl'.format(
                                                                       language)), map_location=self.config.device)[
                 'adapters']
@@ -65,7 +65,7 @@ class PosDepClassifier(nn.Module):
         super().__init__()
         self.config = config
         self.vocabs = config.vocabs[treebank_name]
-        self.xlmr_dim = 768
+        self.xlmr_dim = 768 if config.embedding_name == 'xlm-roberta-base' else 1024
         self.upos_embedding = nn.Embedding(
             num_embeddings=len(self.vocabs[UPOS]),
             embedding_dim=50
@@ -90,7 +90,7 @@ class PosDepClassifier(nn.Module):
             # load pretrained weights
             self.initialized_weights = self.state_dict()
             language = treebank2lang[treebank_name]
-            self.pretrained_tagger_weights = torch.load(os.path.join(self.config._cache_dir, language,
+            self.pretrained_tagger_weights = torch.load(os.path.join(self.config._cache_dir, self.config.embedding_name, language,
                                                                      '{}.tagger.mdl'.format(
                                                                          language)), map_location=self.config.device)[
                 'adapters']
@@ -184,7 +184,7 @@ class TokenizerClassifier(nn.Module):
     def __init__(self, config, treebank_name):
         super().__init__()
         self.config = config
-        self.xlmr_dim = 768
+        self.xlmr_dim = 768 if config.embedding_name == 'xlm-roberta-base' else 1024
         self.tokenizer_ffn = nn.Linear(self.xlmr_dim, 5)
 
         # loss function
@@ -193,7 +193,7 @@ class TokenizerClassifier(nn.Module):
         if not config.training:
             language = treebank2lang[treebank_name]
             # load pretrained weights
-            self.pretrained_tokenizer_weights = torch.load(os.path.join(self.config._cache_dir, language,
+            self.pretrained_tokenizer_weights = torch.load(os.path.join(self.config._cache_dir, self.config.embedding_name, language,
                                                                         '{}.tokenizer.mdl'.format(
                                                                             language)),
                                                            map_location=self.config.device)[

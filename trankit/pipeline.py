@@ -13,6 +13,7 @@ from .utils.tbinfo import tbname2training_id, lang2treebank
 from .utils.chuliu_edmonds import *
 from transformers import XLMRobertaTokenizer
 from datetime import datetime
+import langid
 
 
 def is_string(input):
@@ -40,8 +41,20 @@ def is_list_list_strings(input):
 
 
 class Pipeline:
-    def __init__(self, lang, cache_dir=None, gpu=True):
+    def __init__(self, lang, cache_dir=None, gpu=True, embedding='xlm-roberta-base'):
         super(Pipeline, self).__init__()
+        # auto detection of lang
+        if lang == 'auto':
+            lang = list(code2lang.values())[0]
+            self.auto_mode = True
+        else:
+            self.auto_mode = False
+
+        # set the embedding type
+        assert embedding in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
+            embedding, supported_embeddings)
+        master_config.embedding_name = embedding
+
         self._cache_dir = cache_dir
         self._gpu = gpu
         self._use_gpu = gpu
@@ -56,7 +69,9 @@ class Pipeline:
         # download saved model for initial language
         download(
             cache_dir=self._config._cache_dir,
-            language=lang
+            language=lang,
+            saved_model_version='v1.0.0',  # manually set this to avoid duplicated storage
+            embedding_name=master_config.embedding_name
         )
 
         # load ALL vocabs
@@ -108,7 +123,19 @@ class Pipeline:
 
         # load and hold the pretrained weights
         self._embedding_weights = self._embedding_layers.state_dict()
-        self.set_active(lang)
+
+        if self.auto_mode:
+            for l in code2lang.values():
+                if l not in self.added_langs:
+                    self.add(l)
+            # constrain the language set for auto mode
+            langid.set_languages([lang2code[l] for l in self.added_langs])
+            self.code2lang = code2lang
+            print('=' * 50)
+            print('Trankit is in auto mode!\nAvailable languages: {}'.format(self.added_langs))
+            print('=' * 50)
+        else:
+            self.set_active(lang)
 
     def _setup_config(self, lang):
         torch.cuda.empty_cache()
@@ -132,15 +159,48 @@ class Pipeline:
         if not os.path.exists(master_config._cache_dir):
             os.makedirs(master_config._cache_dir, exist_ok=True)
 
-        master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base',
+        master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
                                                                                cache_dir=os.path.join(
                                                                                    master_config._cache_dir,
-                                                                                   'xlmr'))
+                                                                                   master_config.embedding_name))
         self._config = master_config
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
 
+    def set_auto(self, state):
+        assert type(state) == bool
+        if state is True:
+            print('Turning on auto mode for {} ...'.format(self.added_langs))
+            self.auto_mode = True
+
+            cls_codes = []
+            self.code2lang = {}
+            for l in self.added_langs:
+                if l in extra_lang2code:
+                    cls_codes.append(extra_lang2code[l])
+                    self.code2lang[extra_lang2code[l]] = l
+
+            langid.set_languages(cls_codes)
+            print('=' * 50)
+            print('Trankit is in auto mode!')
+            print('=' * 50)
+        else:
+            self.auto_mode = False
+            lang = self.added_langs[0]
+            self._config.active_lang = lang
+            self.active_lang = lang
+            self._config.treebank_name = lang2treebank[lang]
+            self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
+                                                                        400)  # this is for tokenizer only
+            print('=' * 50)
+            print('Trankit is in normal mode!')
+            print('=' * 50)
+            print('Active language: {}'.format(self._config.active_lang))
+            print('Available languages: {}'.format(self.added_langs))
+            print('=' * 50)
+
     def set_active(self, lang):
+        assert not self.auto_mode, 'Cannot set a particular language as active in auto mode.\nPlease consider using Trankit in the normal mode to use this function.'
         assert is_string(
             lang) and lang in self.added_langs, 'Specified language must be added before being activated.\nCurrent added languages: {}'.format(
             self.added_langs)
@@ -160,17 +220,19 @@ class Pipeline:
         # download saved models
         download(
             cache_dir=self._config._cache_dir,
-            language=lang
+            language=lang,
+            saved_model_version='v1.0.0',  # manually set this to avoid duplicated storage
+            embedding_name=master_config.embedding_name
         )
         # update vocabs
         treebank_name = lang2treebank[lang]
-        with open(os.path.join(self._config._cache_dir,
+        with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
                                '{}/{}.vocabs.json'.format(treebank2lang[treebank_name],
                                                           treebank2lang[treebank_name]))) as f:
             vocabs = json.load(f)
             self._config.vocabs[treebank_name] = vocabs
         if lang in langwithner:
-            with open(os.path.join(self._config._cache_dir,
+            with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
                                    '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                 self._config.ner_vocabs[lang] = json.load(f)
         self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
@@ -203,10 +265,6 @@ class Pipeline:
                 self._ner_model[lang].half()
             self._ner_model[lang].eval()
         self.added_langs.append(lang)
-        print('=' * 50)
-        print('Added languages: {}'.format(self.added_langs))
-        print('Active language: {}'.format(self.active_lang))
-        print('=' * 50)
 
     def _load_vocabs(self):
         self._config.vocabs = {}
@@ -214,7 +272,7 @@ class Pipeline:
         self._config.itos = defaultdict(dict)
         for lang in self.added_langs:
             treebank_name = lang2treebank[lang]
-            with open(os.path.join(self._config._cache_dir,
+            with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
                                    '{}/{}.vocabs.json'.format(lang, lang))) as f:
                 vocabs = json.load(f)
                 self._config.vocabs[treebank_name] = vocabs
@@ -224,7 +282,7 @@ class Pipeline:
             self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
             # ner vocabs
             if lang in langwithner:
-                with open(os.path.join(self._config._cache_dir,
+                with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
                                        '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                     self._config.ner_vocabs[lang] = json.load(f)
 
@@ -244,8 +302,30 @@ class Pipeline:
                 self._embedding_weights[target_name] = value
         self._embedding_layers.load_state_dict(self._embedding_weights)
 
+    def _detect_lang_and_switch(self, text):
+        detected_code = langid.classify(text)[0]
+        assert detected_code in self.code2lang, 'Detected code "{}" must be in {}'.format(detected_code,
+                                                                                          self.code2lang.keys())
+        lang = self.code2lang[detected_code]
+
+        assert is_string(
+            lang) and lang in self.added_langs, 'Specified language must be added before being activated.\nCurrent added languages: {}'.format(
+            self.added_langs)
+        self._config.active_lang = lang
+        self.active_lang = lang
+        self._config.treebank_name = lang2treebank[lang]
+        self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
+                                                                    400)  # this is for tokenizer only
+        # print('=' * 50)
+        # print('Switching to {}'.format(lang))
+        # print('=' * 50)
+
     def ssplit(self, in_doc):  # assuming input is a document
         assert is_string(in_doc), 'Input must be a non-empty string.'
+        # switch to detected lang if auto mode is on
+        if self.auto_mode:
+            self._detect_lang_and_switch(text=in_doc)
+
         eval_batch_size = tbname2tokbatchsize.get(lang2treebank[self.active_lang], self._tokbatchsize)
         # load input text
         config = self._config
@@ -348,20 +428,27 @@ class Pipeline:
                      DSPAN: (sent_span[0], sent_span[1])})
 
         torch.cuda.empty_cache()
-        return {TEXT: in_doc, SENTENCES: sentences}
+        return {TEXT: in_doc, SENTENCES: sentences, LANG: self.active_lang}
 
     def tokenize(self, input, is_sent=False):
         assert is_string(input), 'Input must be a non-empty string.'
+        # switch to detected lang if auto mode is on
+        if self.auto_mode:
+            self._detect_lang_and_switch(text=input)
+
         if type(input) == str and input.isspace():
             return []
         ori_text = deepcopy(input)
         if is_sent:
-            return {TEXT: ori_text, TOKENS: self._tokenize_sent(in_sent=input)}
+            return {TEXT: ori_text, TOKENS: self._tokenize_sent(in_sent=input), LANG: self.active_lang}
         else:
-            return {TEXT: ori_text, SENTENCES: self._tokenize_doc(in_doc=input)}
+            return {TEXT: ori_text, SENTENCES: self._tokenize_doc(in_doc=input), LANG: self.active_lang}
 
     def _tokenize_sent(self, in_sent):  # assuming input is a sentence
         eval_batch_size = tbname2tokbatchsize.get(lang2treebank[self.active_lang], self._tokbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 2)
+
         # load input text
         config = self._config
         test_set = TokenizeDatasetLive(config, in_sent, max_input_length=tbname2max_input_length.get(
@@ -465,6 +552,8 @@ class Pipeline:
 
     def _tokenize_doc(self, in_doc):  # assuming input is a document
         eval_batch_size = tbname2tokbatchsize.get(lang2treebank[self.active_lang], self._tokbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 2)
         # load input text
         config = self._config
         test_set = TokenizeDatasetLive(config, in_doc, max_input_length=tbname2max_input_length.get(
@@ -583,23 +672,38 @@ class Pipeline:
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of non-empty strings.'
 
             if is_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=' '.join(input))
+
                 input = [{ID: k + 1, TEXT: w} for k, w in enumerate(input)]
-                return {TOKENS: self._posdep_sent(in_sent=input)}
+                return {TOKENS: self._posdep_sent(in_sent=input), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, TOKENS: self._posdep_sent(in_sent=input)}
+                return {TEXT: ori_text, TOKENS: self._posdep_sent(in_sent=input), LANG: self.active_lang}
 
         else:
             assert is_string(input) or is_list_list_strings(
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of lists of non-empty strings.'
 
             if is_list_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text='\n'.join([' '.join(sent) for sent in input]))
+
                 input = [{ID: sid + 1, TOKENS: [{ID: tid + 1, TEXT: w} for tid, w in enumerate(sent)]} for sid, sent in
                          enumerate(input)]
-                return {SENTENCES: self._posdep_doc(in_doc=input)}
+                return {SENTENCES: self._posdep_doc(in_doc=input), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, SENTENCES: self._posdep_doc(in_doc=input)}
+                return {TEXT: ori_text, SENTENCES: self._posdep_doc(in_doc=input), LANG: self.active_lang}
 
     def _posdep_sent(self, in_sent):  # assuming input is a sentence
         if type(in_sent) == str:  # input sentence is an untokenized string in this case
@@ -619,9 +723,12 @@ class Pipeline:
         self._load_adapter_weights(model_name='tagger')
 
         # make predictions
+        eval_batch_size = tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 3)
 
         for batch in DataLoader(test_set,
-                                batch_size=tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize),
+                                batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             batch_size = len(batch.word_num)
 
@@ -651,8 +758,8 @@ class Pipeline:
                            range(batch_size)]
 
             for bid in range(batch_size):
+                sentid = batch.sent_index[bid]
                 for i in range(batch.word_num[bid]):
-                    sentid = batch.sent_index[bid]
                     wordid = batch.word_ids[bid][i]
 
                     # upos
@@ -693,9 +800,12 @@ class Pipeline:
         self._load_adapter_weights(model_name='tagger')
 
         # make predictions
+        eval_batch_size = tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 3)
 
         for batch in DataLoader(test_set,
-                                batch_size=tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize),
+                                batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             batch_size = len(batch.word_num)
 
@@ -725,8 +835,8 @@ class Pipeline:
                            range(batch_size)]
 
             for bid in range(batch_size):
+                sentid = batch.sent_index[bid]
                 for i in range(batch.word_num[bid]):
-                    sentid = batch.sent_index[bid]
                     wordid = batch.word_ids[bid][i]
 
                     # upos
@@ -756,23 +866,39 @@ class Pipeline:
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of non-empty strings.'
 
             if is_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=' '.join(input))
+
                 input = [{ID: k + 1, TEXT: w} for k, w in enumerate(input)]
-                return {TOKENS: self._lemmatize_sent(in_sent=input, obmit_tag=True)}
+                return {TOKENS: self._lemmatize_sent(in_sent=input, obmit_tag=True), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, TOKENS: self._lemmatize_sent(in_sent=input, obmit_tag=True)}
+                return {TEXT: ori_text, TOKENS: self._lemmatize_sent(in_sent=input, obmit_tag=True), LANG: self.active_lang}
 
         else:
             assert is_string(input) or is_list_list_strings(
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of lists of non-empty strings.'
 
             if is_list_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text='\n'.join([' '.join(sent) for sent in input]))
+
                 input = [{ID: sid + 1, TOKENS: [{ID: tid + 1, TEXT: w} for tid, w in enumerate(sent)]} for sid, sent in
                          enumerate(input)]
-                return {SENTENCES: self._lemmatize_doc(in_doc=input, obmit_tag=True)}
+                return {SENTENCES: self._lemmatize_doc(in_doc=input, obmit_tag=True), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, SENTENCES: self._lemmatize_doc(in_doc=input, obmit_tag=True)}
+                return {TEXT: ori_text, SENTENCES: self._lemmatize_doc(in_doc=input, obmit_tag=True), LANG: self.active_lang}
 
     def _lemmatize_sent(self, in_sent, obmit_tag=False):
         if type(in_sent) == str:
@@ -803,23 +929,47 @@ class Pipeline:
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of non-empty strings.'
 
             if is_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=' '.join(input))
+
+                assert self.active_lang in langwithner, 'NER module is not available for "{}"'.format(self.active_lang)
+
                 input = [{ID: k + 1, TEXT: w} for k, w in enumerate(input)]
-                return {TOKENS: self._ner_sent(in_sent=input)}
+                return {TOKENS: self._ner_sent(in_sent=input), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
+                assert self.active_lang in langwithner, 'NER module is not available for "{}"'.format(self.active_lang)
+
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, TOKENS: self._ner_sent(in_sent=input)}
+                return {TEXT: ori_text, TOKENS: self._ner_sent(in_sent=input), LANG: self.active_lang}
 
         else:
             assert is_string(input) or is_list_list_strings(
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of lists of non-empty strings.'
 
             if is_list_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text='\n'.join([' '.join(sent) for sent in input]))
+
+                assert self.active_lang in langwithner, 'NER module is not available for "{}"'.format(self.active_lang)
+
                 input = [{ID: sid + 1, TOKENS: [{ID: tid + 1, TEXT: w} for tid, w in enumerate(sent)]} for sid, sent in
                          enumerate(input)]
-                return {SENTENCES: self._ner_doc(in_doc=input)}
+                return {SENTENCES: self._ner_doc(in_doc=input), LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
+                assert self.active_lang in langwithner, 'NER module is not available for "{}"'.format(self.active_lang)
+
                 ori_text = deepcopy(input)
-                return {TEXT: ori_text, SENTENCES: self._ner_doc(in_doc=input)}
+                return {TEXT: ori_text, SENTENCES: self._ner_doc(in_doc=input), LANG: self.active_lang}
 
     def _ner_sent(self, in_sent):  # assuming input is a document
         if type(in_sent) == str:
@@ -834,22 +984,26 @@ class Pipeline:
         test_set.numberize()
         # load ner adapter weights
         self._load_adapter_weights(model_name='ner')
+        eval_batch_size = tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 3)
 
-        predictions = []
         for batch in DataLoader(test_set,
-                                batch_size=tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize),
+                                batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             word_reprs, cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
             pred_entity_labels = self._ner_model[self._config.active_lang].predict(batch, word_reprs)
-            predictions += pred_entity_labels
 
-        sid = 0
-        for sentence in dner_doc:
-            tid = 0
-            for token in sentence[TOKENS]:
-                token[NER] = predictions[sid][tid]
-                tid += 1
-            sid += 1
+            batch_size = len(batch.word_num)
+
+            for bid in range(batch_size):
+                sentid = batch.sent_index[bid]
+                for i in range(batch.word_num[bid]):
+                    wordid = batch.word_ids[bid][i]
+
+                    # NER tag
+                    dner_doc[sentid][TOKENS][wordid][NER] = pred_entity_labels[bid][i]
+
         torch.cuda.empty_cache()
         return dner_doc[0][TOKENS]
 
@@ -865,22 +1019,26 @@ class Pipeline:
         test_set.numberize()
         # load ner adapter weights
         self._load_adapter_weights(model_name='ner')
+        eval_batch_size = tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize)
+        if self._config.embedding_name == 'xlm-roberta-large':
+            eval_batch_size = int(eval_batch_size / 3)
 
-        predictions = []
         for batch in DataLoader(test_set,
-                                batch_size=tbname2tagbatchsize.get(self._config.treebank_name, self._tagbatchsize),
+                                batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             word_reprs, cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
             pred_entity_labels = self._ner_model[self._config.active_lang].predict(batch, word_reprs)
-            predictions += pred_entity_labels
 
-        sid = 0
-        for sentence in dner_doc:
-            tid = 0
-            for token in sentence[TOKENS]:
-                token[NER] = predictions[sid][tid]
-                tid += 1
-            sid += 1
+            batch_size = len(batch.word_num)
+
+            for bid in range(batch_size):
+                sentid = batch.sent_index[bid]
+                for i in range(batch.word_num[bid]):
+                    wordid = batch.word_ids[bid][i]
+
+                    # NER tag
+                    dner_doc[sentid][TOKENS][wordid][NER] = pred_entity_labels[bid][i]
+
         torch.cuda.empty_cache()
         return dner_doc
 
@@ -890,38 +1048,54 @@ class Pipeline:
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of non-empty strings.'
 
             if is_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=' '.join(input))
+
                 tokenized_sent = [{ID: k + 1, TEXT: w} for k, w in enumerate(input)]
                 tagged_sent = self._posdep_sent(tokenized_sent)
                 out = self._lemmatize_sent(tagged_sent)
                 if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_sent(out)
-                final = {TOKENS: out}
+                final = {TOKENS: out, LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
                 ori_text = deepcopy(input)
                 tagged_sent = self._posdep_sent(input)
                 out = self._lemmatize_sent(tagged_sent)
                 if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_sent(out)
-                final = {TEXT: ori_text, TOKENS: out}
+                final = {TEXT: ori_text, TOKENS: out, LANG: self.active_lang}
         else:
             assert is_string(input) or is_list_list_strings(
                 input), 'Input must be one of the following:\n(i) A non-empty string.\n(ii) A list of lists of non-empty strings.'
 
             if is_list_list_strings(input):
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text='\n'.join([' '.join(sent) for sent in input]))
+
                 input = [{ID: sid + 1, TOKENS: [{ID: tid + 1, TEXT: w} for tid, w in enumerate(sent)]} for sid, sent in
                          enumerate(input)]
                 tagged_doc = self._posdep_doc(input)
                 out = self._lemmatize_doc(tagged_doc)
                 if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_doc(out)
-                final = {SENTENCES: out}
+                final = {SENTENCES: out, LANG: self.active_lang}
             else:
+                # switch to detected lang if auto mode is on
+                if self.auto_mode:
+                    self._detect_lang_and_switch(text=input)
+
                 ori_text = deepcopy(input)
                 tagged_doc = self._posdep_doc(in_doc=input)
                 out = self._lemmatize_doc(tagged_doc)
                 if self._config.active_lang in langwithner:  # ner if possible
                     out = self._ner_doc(out)
-                final = {TEXT: ori_text, SENTENCES: out}
+                final = {TEXT: ori_text, SENTENCES: out, LANG: self.active_lang}
         return final
 
     def _conllu_predict(self, text_fpath):

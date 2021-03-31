@@ -57,12 +57,12 @@ def unzip(dir, filename):
     os.remove(os.path.join(dir, filename))
 
 
-def download(cache_dir, language):  # put a try-catch here
-    lang_dir = os.path.join(cache_dir, language)
-    save_fpath = os.path.join(cache_dir, language, '{}.zip'.format(language))
+def download(cache_dir, language, saved_model_version, embedding_name):  # put a try-catch here
+    lang_dir = os.path.join(cache_dir, embedding_name, language)
+    save_fpath = os.path.join(lang_dir, '{}.zip'.format(language))
 
     if not os.path.exists(os.path.join(lang_dir, '{}.downloaded'.format(language))):
-        url = "http://nlp.uoregon.edu/download/trankit/{}.zip".format(language)
+        url = "http://nlp.uoregon.edu/download/trankit/{}/{}/{}.zip".format(saved_model_version, embedding_name, language)
         print(url)
 
         response = requests.get(url, stream=True)

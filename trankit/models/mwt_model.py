@@ -193,7 +193,7 @@ class MWTWrapper:
     def __init__(self, config, treebank_name, use_gpu, evaluate=True):
         self.config = config
         if evaluate:
-            self.model, self.args, self.loaded_args, self.vocab = get_mwt_model(config._cache_dir,
+            self.model, self.args, self.loaded_args, self.vocab = get_mwt_model(os.path.join(config._cache_dir, config.embedding_name),
                                                                                 language=treebank2lang[treebank_name],
                                                                                 use_gpu=use_gpu)
             print('Loading multi-word expander for {}'.format(treebank2lang[treebank_name]))

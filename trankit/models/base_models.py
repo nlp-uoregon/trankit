@@ -3,19 +3,20 @@ from transformers import AdapterConfig
 from ..utils.base_utils import *
 
 
-class Base_Model(nn.Module):
+class Base_Model(nn.Module):  # currently assuming the pretrained transformer is XLM-Roberta
     def __init__(self, config, task_name):
         super().__init__()
         self.config = config
         self.task_name = task_name
         # xlmr encoder
-        self.xlmr_dim = 768
-        self.xlmr = XLMRobertaModel.from_pretrained(config.xlmr_model_name,
-                                                    cache_dir=os.path.join(config._cache_dir, 'xlmr'),
+        self.xlmr_dim = 768 if config.embedding_name == 'xlm-roberta-base' else 1024
+        self.xlmr = XLMRobertaModel.from_pretrained(config.embedding_name,
+                                                    cache_dir=os.path.join(config._cache_dir, config.embedding_name),
                                                     output_hidden_states=True)
-        self.xlmr_dropout = nn.Dropout(p=config.xlmr_dropout)
+        self.xlmr_dropout = nn.Dropout(p=config.embedding_dropout)
         # add task adapters
-        task_config = AdapterConfig.load("pfeiffer", reduction_factor=6)
+        task_config = AdapterConfig.load("pfeiffer",
+                                         reduction_factor=6 if config.embedding_name == 'xlm-roberta-base' else 4)
         self.xlmr.add_adapter(task_name, AdapterType.text_task, config=task_config)
         self.xlmr.train_adapter([task_name])
         self.xlmr.set_active_adapters([task_name])
@@ -40,7 +41,7 @@ class Base_Model(nn.Module):
         idxs = piece_idxs.new(idxs).unsqueeze(-1).expand(batch_size, -1, self.xlmr_dim) + 1
         masks = xlmr_outputs.new(masks).unsqueeze(-1)
         xlmr_outputs = torch.gather(xlmr_outputs, 1,
-                                    idxs) * masks  
+                                    idxs) * masks
         xlmr_outputs = xlmr_outputs.view(batch_size, token_num, token_len, self.xlmr_dim)
         xlmr_outputs = xlmr_outputs.sum(2)
         return xlmr_outputs, cls_reprs

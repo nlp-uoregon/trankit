@@ -1,13 +1,15 @@
 from . import *
 
-# for sents
+
 instance_fields = [
+    'sent_index', 'word_ids',
     'words', 'word_num',
     'piece_idxs', 'attention_masks', 'word_lens',
     'entity_label_idxs'
 ]
 
 batch_fields = [
+    'sent_index', 'word_ids',
     'words', 'word_num', 'word_mask',
     'piece_idxs', 'attention_masks', 'word_lens',
     'entity_label_idxs'
@@ -17,6 +19,22 @@ Instance = namedtuple('Instance', field_names=instance_fields)
 
 Batch = namedtuple('Batch', field_names=batch_fields)
 
+train_instance_fields = [
+    'words', 'word_num',
+    'piece_idxs', 'attention_masks', 'word_lens',
+    'entity_label_idxs'
+]
+
+train_batch_fields = [
+    'words', 'word_num', 'word_mask',
+    'piece_idxs', 'attention_masks', 'word_lens',
+    'entity_label_idxs'
+]
+
+Train_Instance = namedtuple('Train_Instance', field_names=train_instance_fields)
+
+Train_Batch = namedtuple('Train_Batch', field_names=train_batch_fields)
+
 
 class NERDatasetLive(Dataset):
     def __init__(self, config, tokenized_sentences):
@@ -24,7 +42,44 @@ class NERDatasetLive(Dataset):
         self.wordpiece_splitter = config.wordpiece_splitter
         self.max_input_length = 512
         # load data
-        self.data = [{'words': sentence} for sentence in tokenized_sentences]
+        self.data = [{'sent_index': sid, 'words': sentence, 'word_ids': list(range(len(sentence)))} for sid, sentence in
+                     enumerate(tokenized_sentences)]
+
+        # split long sentences into 512-length chunks
+        new_data = []
+        for inst in self.data:
+            words = inst['words']
+            pieces = [[p for p in self.wordpiece_splitter.tokenize(w) if p != '▁'] for w in words]
+            for ps in pieces:
+                if len(ps) == 0:
+                    ps += ['-']
+            flat_pieces = [p for ps in pieces for p in ps]
+            if len(flat_pieces) > self.max_input_length - 2:
+                sub_insts = []
+                cur_inst = deepcopy(inst)
+                for key in ['words', 'word_ids', 'flat_pieces']:
+                    cur_inst[key] = []
+
+                for i in range(len(inst['words'])):
+                    for key in ['words', 'word_ids']:
+                        cur_inst[key].append(inst[key][i])
+                    cur_inst['flat_pieces'].extend(pieces[i])
+                    if len(cur_inst['flat_pieces']) >= self.max_input_length - 10:
+                        sub_insts.append(cur_inst)
+
+                        cur_inst = deepcopy(inst)
+                        for key in ['words', 'word_ids', 'flat_pieces']:
+                            cur_inst[key] = []
+
+                if len(cur_inst['flat_pieces']) > 0:
+                    sub_insts.append(cur_inst)
+
+                # all sub instances share the same sent_index,
+                # 'word_ids' is used for later filling predictions into the right place
+                new_data.extend(sub_insts)
+            else:
+                new_data.append(inst)
+        self.data = new_data
 
         # load vocab
         self.vocabs = self.config.ner_vocabs[self.config.active_lang]
@@ -61,6 +116,8 @@ class NERDatasetLive(Dataset):
             piece_idxs = piece_idxs
 
             instance = Instance(
+                sent_index=inst['sent_index'],
+                word_ids=inst['word_ids'],
                 words=inst['words'],
                 word_num=len(inst['words']),
                 piece_idxs=piece_idxs,
@@ -72,6 +129,9 @@ class NERDatasetLive(Dataset):
         self.data = data
 
     def collate_fn(self, batch):
+        batch_sent_index = [inst.sent_index for inst in batch]
+        batch_word_ids = [inst.word_ids for inst in batch]
+
         batch_words = [inst.words for inst in batch]
         batch_word_num = [inst.word_num for inst in batch]
 
@@ -99,6 +159,8 @@ class NERDatasetLive(Dataset):
         batch_entity_label_idxs = torch.LongTensor(batch_entity_label_idxs).to(self.config.device)
 
         return Batch(
+            sent_index=batch_sent_index,
+            word_ids=batch_word_ids,
             words=batch_words,
             word_num=batch_word_num,
             word_mask=batch_word_mask,
@@ -159,7 +221,7 @@ class NERDataset(Dataset):
 
             entity_label_idxs = [self.vocabs[label] for label in inst['entity-labels']]
 
-            instance = Instance(
+            instance = Train_Instance(
                 words=inst['words'],
                 word_num=len(inst['words']),
                 piece_idxs=piece_idxs,
@@ -201,7 +263,7 @@ class NERDataset(Dataset):
         batch_word_num = torch.cuda.LongTensor(batch_word_num)
         batch_word_mask = torch.cuda.LongTensor(batch_word_mask).eq(0)
 
-        return Batch(
+        return Train_Batch(
             words=batch_words,
             word_num=batch_word_num,
             word_mask=batch_word_mask,

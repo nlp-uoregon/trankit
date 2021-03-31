@@ -322,7 +322,7 @@ class LemmaWrapper:
             if self.treebank_name in ['UD_Old_French-SRCMF', 'UD_Vietnamese-VTB', 'UD_Vietnamese-VLSP']:
                 self.args = get_identity_lemma_model()
             else:
-                self.model, self.args, self.loaded_args, self.vocab = get_lemma_model(self.config._cache_dir,
+                self.model, self.args, self.loaded_args, self.vocab = get_lemma_model(os.path.join(self.config._cache_dir, self.config.embedding_name),
                                                                                       treebank2lang[treebank_name],
                                                                                       use_gpu)
             print('Loading lemmatizer for {}'.format(treebank2lang[treebank_name]))

@@ -1,6 +1,9 @@
-import os, json
+import os, json, sys
 import trankit
 from time import sleep
+
+embedding = sys.argv[1]
+
 
 def is_equal(a, b):
     with open('a.json', 'w') as f:
@@ -14,9 +17,8 @@ def is_equal(a, b):
     if ajson == bjson: return True
     return False
 
-p = trankit.Pipeline('english')
 
-os.system('mkdir -p trankit/tests/sample_outputs')
+p = trankit.Pipeline('english', embedding=embedding)
 
 num_passed = 0
 
@@ -27,9 +29,10 @@ for lid, lang in enumerate(trankit.supported_langs):
         text = f.read()
 
     all_doc = p(text)
-    with open('trankit/tests/sample_outputs/{}.json'.format(lang)) as f:
+    with open('trankit/tests/sample_outputs/{}/{}.json'.format(embedding, lang)) as f:
         sample_output = json.load(f)
 
+    # this might not always be equal due to the difference of the running environment
     if not is_equal(all_doc, sample_output): continue
 
     all_sent = p(text, is_sent=True)

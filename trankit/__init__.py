@@ -2,7 +2,7 @@ from .pipeline import Pipeline
 from .tpipeline import TPipeline
 from .pipeline import supported_langs, langwithner, remove_with_path
 
-__version__ = "0.3.7"
+__version__ = "1.0.0"
 
 
 def verify_customized_pipeline(category, save_dir):
@@ -57,7 +57,8 @@ def verify_customized_pipeline(category, save_dir):
         remove_with_path(os.path.join(save_dir, category, 'train.txt.character'))
         remove_with_path(os.path.join(save_dir, category, 'logs'))
         remove_with_path(os.path.join(save_dir, category, 'preds'))
-        remove_with_path(os.path.join(save_dir, category, 'xlmr'))
+        remove_with_path(os.path.join(save_dir, category, 'xlm-roberta-large'))
+        remove_with_path(os.path.join(save_dir, category, 'xlm-roberta-base'))
         print(
             "Customized pipeline is ready to use!\nIt can be initialized as follows:\n-----------------------------------\nfrom trankit import Pipeline\np = Pipeline(lang='{}', cache_dir='{}')".format(
                 category, save_dir))

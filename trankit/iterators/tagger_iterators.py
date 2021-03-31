@@ -35,7 +35,7 @@ class TaggerDatasetLive(Dataset):
         self.tokenized_doc = tokenized_doc
 
         language = treebank2lang[self.treebank_name]
-        self.vocabs_fpath = os.path.join(self.config._cache_dir, language,
+        self.vocabs_fpath = os.path.join(self.config._cache_dir, self.config.embedding_name, language,
                                          '{}.vocabs.json'.format(language))
 
         self.vocabs = {}
@@ -57,7 +57,42 @@ class TaggerDatasetLive(Dataset):
             self.max_input_length,
             self.tokenized_doc
         )
+        # split long sentences into 512-length chunks
+        new_data = []
+        for inst in self.data:
+            words = inst['words']
+            pieces = [[p for p in self.wordpiece_splitter.tokenize(w) if p != '▁'] for w in words]
+            for ps in pieces:
+                if len(ps) == 0:
+                    ps += ['-']
+            flat_pieces = [p for ps in pieces for p in ps]
+            if len(flat_pieces) > self.max_input_length - 2:
+                sub_insts = []
+                cur_inst = deepcopy(inst)
+                for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL, 'flat_pieces']:
+                    cur_inst[key] = []
 
+                for i in range(len(inst['words'])):
+                    for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL]:
+                        cur_inst[key].append(inst[key][i])
+                    cur_inst['flat_pieces'].extend(pieces[i])
+                    if len(cur_inst['flat_pieces']) >= self.max_input_length - 10:
+                        sub_insts.append(cur_inst)
+
+                        cur_inst = deepcopy(inst)
+                        for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL, 'flat_pieces']:
+                            cur_inst[key] = []
+
+                if len(cur_inst['flat_pieces']) > 0:
+                    sub_insts.append(cur_inst)
+
+                # all sub instances share the same sent_index,
+                # 'word_ids' is used for later filling predictions into the right place
+                new_data.extend(sub_insts)
+            else:
+                new_data.append(inst)
+        self.data = new_data
+        
     def numberize(self):
         wordpiece_splitter = self.wordpiece_splitter
         data = []
