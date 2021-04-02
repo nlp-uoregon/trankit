@@ -128,7 +128,7 @@ fr_output = p.posdep('''On pourra toujours parler à propos d'Averroès de "déc
 # NER tagging a Vietnamese input
 vi_output = p.ner('''Cuộc tiêm thử nghiệm tiến hành tại Học viện Quân y, Hà Nội''')
 ```
-In this example, code name `'auto'` is used to initialize a multilingual pipeline in the Auto Mode. For more information on the new Auto Mode, please visit [this page](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Note that, the [manual mode](https://trankit.readthedocs.io/en/latest/overview.html#multilingual-usage) can still be used as before.
+In this example, the code name `'auto'` is used to initialize a multilingual pipeline in the Auto Mode. For more information, please visit [this page](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Note that, besides the new Auto Mode, the [manual mode](https://trankit.readthedocs.io/en/latest/overview.html#multilingual-usage) can still be used as before.
 
 #### Building a customized pipeline
 Training customized pipelines is easy with Trankit via the class `TPipeline`. Below we show how we can train a token and sentence splitter on customized data.
