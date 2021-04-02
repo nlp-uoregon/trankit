@@ -112,7 +112,7 @@ Note that, although pretokenized inputs can always be processed, using pretokeni
 For more detailed examples, please check out our [documentation page](https://trankit.readthedocs.io/en/latest/overview.html).
 
 #### Multilingual usage
-Starting from version v1.0.0, Trankit supports a handy Auto Mode in which users do not have to set a particular language active before processing the input. In the Auto Mode, Trankit will automatically detect the language of the input and use the corresponding language-specific models, thus avoiding switching back and forth between languages in a multilingual pipeline.
+Starting from version v1.0.0, Trankit supports a handy [Auto Mode](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines) in which users do not have to set a particular language active before processing the input. In the Auto Mode, Trankit will automatically detect the language of the input and use the corresponding language-specific models, thus avoiding switching back and forth between languages in a multilingual pipeline.
 
 ```python
 from trankit import Pipeline
