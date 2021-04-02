@@ -112,33 +112,23 @@ Note that, although pretokenized inputs can always be processed, using pretokeni
 For more detailed examples, please check out our [documentation page](https://trankit.readthedocs.io/en/latest/overview.html).
 
 #### Multilingual usage
-In case we want to process inputs of different languages, we need to initialize a multilingual pipeline.
+Starting from version v1.0.0, Trankit supports a handy Auto Mode in which users do not have to set a particular language active before processing the input. In the Auto Mode, Trankit will automatically detect the language of the input and use the corresponding language-specific models, thus avoiding switching back and forth between languages in a multilingual pipeline.
+
 ```python
 from trankit import Pipeline
 
-# initialize a multilingual pipeline
-p = Pipeline(lang='english', gpu=True, cache_dir='./cache')
+p = Pipeline('auto')
 
-langs = ['arabic', 'chinese', 'dutch']
-for lang in langs:
-    p.add(lang)
+# Tokenizing an English input
+en_output = p.tokenize('''I figured I would put it out there anyways.''') 
 
-# tokenize an English input
-p.set_active('english')
-en = p.tokenize('Rich was here before the scheduled time.')
+# POS, Morphological tagging and Dependency parsing a French input
+fr_output = p.posdep('''On pourra toujours parler à propos d'Averroès de "décentrement du Sujet".''')
 
-# get ner tags for an Arabic input
-p.set_active('arabic')
-ar = p.ner('وكان كنعان قبل ذلك رئيس جهاز الامن والاستطلاع للقوات السورية العاملة في لبنان.')
+# NER tagging a Vietnamese input
+vi_output = p.ner('''Cuộc tiêm thử nghiệm tiến hành tại Học viện Quân y, Hà Nội''')
 ```
-In this example, `.set_active()` is used to switch between languages.
-
-Note that, starting from version v1.0.0, we can turn on the Auto Mode for the multilingual pipeline by:
-
-```python
-p.set_auto(True)
-```
-In this way, we don't have to switch to a specific language before processing the input. More about the Auto Mode is available [here](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines).
+In this example, code name `'auto'` is used to initialize a multilingual pipeline in the Auto Mode. For more information on the new Auto Mode, please visit [this page](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Note that, the [manual mode](https://trankit.readthedocs.io/en/latest/overview.html#multilingual-usage) can still be used as before.
 
 #### Building a customized pipeline
 Training customized pipelines is easy with Trankit via the class `TPipeline`. Below we show how we can train a token and sentence splitter on customized data.
