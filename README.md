@@ -53,10 +53,10 @@ We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoreg
 Trankit can be easily installed via one of the following methods:
 #### Using pip
 ```
-pip install trankit
+pip install trankit==1.0.1
 ```
 The command would install Trankit and all dependent packages automatically. 
-Note that, due to [this issue](https://github.com/nlp-uoregon/trankit/issues/3) relating to [adapter-transformers](https://github.com/Adapter-Hub/adapter-transformers) which is an extension of the `transformers` library, users may need to uninstall `transformers` before installing `trankit` to avoid potential conflicts.
+Note that, starting from version `1.0.1`, [this issue](https://github.com/nlp-uoregon/trankit/issues/3) relating to [adapter-transformers](https://github.com/Adapter-Hub/adapter-transformers) has been fixed.
 
 #### From source
 ```

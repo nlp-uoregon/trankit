@@ -1,3 +1,10 @@
+'''
+Renamed the library and stored its copy internally to fix the conflict issue with the original transformers library.
+This directiory is borrowed from: https://github.com/Adapter-Hub/adapter-transformers/tree/451a0a8335a21fd383cbdf7f1bd33bfc9245f605
+
+Date: 2021/04/03
+'''
+
 # flake8: noqa
 # There's no way to ignore "F401 '...' imported but unused" warnings in this
 # module, but to preserve other warnings. So, don't check this module at all.
