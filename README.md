@@ -70,7 +70,7 @@ Previous versions of Trankit have encountered the [compatibility issue](https://
 ```
 pip install trankit==1.0.1
 ```
-If you encounter any other problem with the installation, please raise an issue [here] to let us know. Thanks.
+If you encounter any other problem with the installation, please raise an issue [here](https://github.com/nlp-uoregon/trankit/issues/new) to let us know. Thanks.
 
 ### Usage
 Trankit can process inputs which are untokenized (raw) or pretokenized strings, at
