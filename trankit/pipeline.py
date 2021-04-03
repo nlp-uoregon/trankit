@@ -11,7 +11,7 @@ from collections import defaultdict
 from .utils.conll import *
 from .utils.tbinfo import tbname2training_id, lang2treebank
 from .utils.chuliu_edmonds import *
-from transformers import XLMRobertaTokenizer
+from .adapter_transformers import XLMRobertaTokenizer
 from datetime import datetime
 import langid
 

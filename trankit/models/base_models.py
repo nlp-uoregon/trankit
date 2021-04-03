@@ -1,5 +1,5 @@
-from transformers import AdapterType, XLMRobertaModel
-from transformers import AdapterConfig
+from ..adapter_transformers import AdapterType, XLMRobertaModel
+from ..adapter_transformers import AdapterConfig
 from ..utils.base_utils import *
 
 
