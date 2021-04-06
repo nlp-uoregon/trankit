@@ -217,5 +217,7 @@ In this command, we can put more processing options at `[OPTIONS]`. Detailed des
        python -m trankit [other options] --task sall
     
     -Part-of-speech tagging, Morphological tagging, Dependency parsing, Named Entity Recognition.
+
+	 Assuming each input file contains pretokenized SENTENCES separated by "\n\n", each sentence is organized into multiple lines, each line contains only a single word (`--input_format pretok`).
        
        python -m trankit [other options] --task pall
