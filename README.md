@@ -155,5 +155,14 @@ trainer.train()
 ```
 Detailed guidelines for training and loading a customized pipeline can be found [here](https://trankit.readthedocs.io/en/latest/training.html) 
 
+#### Sharing your customized pipelines
+
+In case you want to share your customized pipelines with other users. Please create an issue [here](https://github.com/nlp-uoregon/trankit/issues/new) and provide us the following information:
+
+- Training data that you used to train your models, e.g., data license, data source, and some data statistics (i.e., sizes of training, development, and test data).
+- Performance of your pipelines on your test data using the official [evaluation script](https://universaldependencies.org/conll18/evaluation.html).
+- A downloadable link to your trained model files (a Google drive link would be great).
+After we receive your request, we will check and test your pipelines. Once everything is done, we would make the pipelines accessible by other users via new language codes.
+
 ### Acknowledgements
 We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza). To implement the language detection module, we leverage the [langid](https://github.com/saffsd/langid.py) library.
