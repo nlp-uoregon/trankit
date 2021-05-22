@@ -22,7 +22,7 @@ If you use Trankit in your research or software. Please cite `our following pape
 
    @inproceedings{nguyen2021trankit,
       title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
-      author={Minh Van Nguyen, Viet Lai, Amir Pouran Ben Veyseh and Thien Huu Nguyen},
+      author={Nguyen, Minh Van and Lai, Viet and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
       booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
       year={2021}
    }

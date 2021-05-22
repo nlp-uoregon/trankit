@@ -42,7 +42,7 @@ We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoreg
 ```bibtex
 @inproceedings{nguyen2021trankit,
       title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
-      author={Minh Van Nguyen, Viet Lai, Amir Pouran Ben Veyseh and Thien Huu Nguyen},
+      author={Nguyen, Minh Van and Lai, Viet and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
       booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
       year={2021}
 }
