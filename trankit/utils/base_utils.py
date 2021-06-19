@@ -18,6 +18,40 @@ from .scorers import conll18_ud_eval as ud_eval
 SPACE_RE = re.compile(r'\s')
 
 
+def trankit2conllu(trankit_output):
+    assert type(trankit_output) == dict, "`trankit_output` must be a Python dictionary!"
+    if SENTENCES in trankit_output and len(trankit_output[SENTENCES]) > 0 and TOKENS in trankit_output[SENTENCES][0]:
+        output_type = 'document'
+    elif TOKENS in trankit_output:
+        output_type = 'sentence'
+    else:
+        print("Unknown format of `trankit_output`!")
+        return None
+    try:
+        if output_type == 'document':
+            json_doc = trankit_output[SENTENCES]
+        else:
+            assert output_type == 'sentence'
+            json_doc = [trankit_output]
+
+        conllu_doc = []
+        for sentence in json_doc:
+            conllu_sentence = []
+            for token in sentence[TOKENS]:
+                if type(token[ID]) == int or len(token[ID]) == 1:
+                    conllu_sentence.append(token)
+                else:
+                    conllu_sentence.append(token)
+                    for word in token[EXPANDED]:
+                        conllu_sentence.append(word)
+            conllu_doc.append(conllu_sentence)
+
+        return CoNLL.dict2conllstring(conllu_doc)
+    except:
+        print('Unsuccessful conversion! Please check the format of `trankit_output`')
+        return None
+
+
 def remove_with_path(path):
     if os.path.exists(path):
         if os.path.isdir(path):
@@ -62,7 +96,8 @@ def download(cache_dir, language, saved_model_version, embedding_name):  # put a
     save_fpath = os.path.join(lang_dir, '{}.zip'.format(language))
 
     if not os.path.exists(os.path.join(lang_dir, '{}.downloaded'.format(language))):
-        url = "http://nlp.uoregon.edu/download/trankit/{}/{}/{}.zip".format(saved_model_version, embedding_name, language)
+        url = "http://nlp.uoregon.edu/download/trankit/{}/{}/{}.zip".format(saved_model_version, embedding_name,
+                                                                            language)
         print(url)
 
         response = requests.get(url, stream=True)

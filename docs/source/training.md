@@ -118,7 +118,8 @@ import trankit
 
 trankit.verify_customized_pipeline(
     category='customized-mwt-ner', # pipeline category
-    save_dir='./save_dir' # directory used for saving models in previous steps
+    save_dir='./save_dir', # directory used for saving models in previous steps
+    embedding_name='xlm-roberta-base' # embedding version that we use for training our customized pipeline, by default, it is `xlm-roberta-base`
 )
 ```
 If the verification is success, this would printout the following:
@@ -130,3 +131,29 @@ from trankit import Pipeline
 p = Pipeline(lang='customized-mwt-ner', cache_dir='./save_dir')
 ```
 From now on, the customized pipeline can be used as a normal pretrained pipeline.
+
+The verification would fail if some of the expected model files of the pipeline are missing. This can be solved via the handy function `download_missing_files`, which is created for borrowing model files from pretrained pipelines provided by Trankit. Suppose that the language of your customized pipeline is English, the function can be used as below:
+```
+import trankit
+
+trankit.download_missing_files(
+	category='customized-ner', 
+	save_dir='./save_dir', 
+	embedding_name='xlm-roberta-base', 
+	language='english'
+)
+``` 
+where `category` is the category that we specified for the customized pipeline, `save_dir` is the path to the directory that we saved the customized models, `embedding_name` is the embedding that we used for the customized pipeline (which is `xlm-roberta-base` by default if we did not specify this in the training process), and `language` is the language with the pretrained models that we want to borrow. For example, if we only trained a NER model for the customized pipeline, the snippet above would borrow the trained models for all the other pipeline components and print out the following message:
+```
+Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl
+Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl
+Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner.vocabs.json
+Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner_lemmatizer.pt
+http://nlp.uoregon.edu/download/trankit/v1.0.0/xlm-roberta-base/english.zip
+Downloading: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 47.9M/47.9M [00:00<00:00, 114MiB/s]
+Copying ./save_dir/xlm-roberta-base/english/english.tokenizer.mdl to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl
+Copying ./save_dir/xlm-roberta-base/english/english.tagger.mdl to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl
+Copying ./save_dir/xlm-roberta-base/english/english.vocabs.json to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.vocabs.json
+Copying ./save_dir/xlm-roberta-base/english/english_lemmatizer.pt to ./save_dir/xlm-roberta-base/customized-ner/customized-ner_lemmatizer.pt
+```
+After this, we can go back to do the verification step again.

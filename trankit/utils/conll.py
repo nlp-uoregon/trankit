@@ -166,3 +166,11 @@ class CoNLL:
         conll_string = CoNLL.conll_as_string(doc_conll)
         with open(filename, 'w') as outfile:
             outfile.write(conll_string)
+
+    @staticmethod
+    def dict2conllstring(doc_dict):
+        """ Convert the dictionary format input data to the CoNLL-U format output data and write to a file.
+        """
+        doc_conll = CoNLL.convert_dict(doc_dict)
+        conll_string = CoNLL.conll_as_string(doc_conll)
+        return conll_string

@@ -160,7 +160,7 @@ class TPipeline:
 
         # device and save dir
         self._save_dir = training_config['save_dir'] if 'save_dir' in training_config else './cache/'
-        self._save_dir = os.path.join(self._save_dir, self._lang)
+        self._save_dir = os.path.join(self._save_dir, master_config.embedding_name, self._lang)
         self._cache_dir = self._save_dir
         self._gpu = training_config['gpu'] if 'gpu' in training_config else True
         self._use_gpu = training_config['gpu'] if 'gpu' in training_config else True
@@ -211,9 +211,7 @@ class TPipeline:
         # wordpiece splitter
         if self._task not in ['mwt', 'lemmatize']:
             master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
-                                                                                   cache_dir=os.path.join(
-                                                                                       master_config._save_dir,
-                                                                                       master_config.embedding_name))
+                                                                                   cache_dir=master_config._save_dir)
 
     def _prepare_tokenize(self):
         self.train_set = TokenizeDataset(

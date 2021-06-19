@@ -1,5 +1,7 @@
 supported_embeddings = ['xlm-roberta-base', 'xlm-roberta-large']
 
+saved_model_version = 'v1.0.0'
+
 langwithner = {
     'arabic',
     'chinese',

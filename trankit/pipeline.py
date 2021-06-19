@@ -70,7 +70,7 @@ class Pipeline:
         download(
             cache_dir=self._config._cache_dir,
             language=lang,
-            saved_model_version='v1.0.0',  # manually set this to avoid duplicated storage
+            saved_model_version=saved_model_version,  # manually set this to avoid duplicated storage
             embedding_name=master_config.embedding_name
         )
 
