@@ -7,7 +7,7 @@ Users need to install Trankit via one of the following methods:
 
 Pip:
 ```
-pip install trankit==1.0.1
+pip install trankit==1.1.0
 ```
 
 From source:
