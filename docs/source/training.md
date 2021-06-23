@@ -150,7 +150,7 @@ where `category` is the category that we specified for the customized pipeline, 
 # Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner.vocabs.json
 # Missing ./save_dir/xlm-roberta-base/customized-ner/customized-ner_lemmatizer.pt
 # http://nlp.uoregon.edu/download/trankit/v1.0.0/xlm-roberta-base/english.zip
-# Downloading: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 47.9M/47.9M [00:00<00:00, 114MiB/s]
+# Downloading: 100%|█| 47.9M/47.9M [00:00<00:00, 89.2MiB/s]
 # Copying ./save_dir/xlm-roberta-base/english/english.tokenizer.mdl to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tokenizer.mdl
 # Copying ./save_dir/xlm-roberta-base/english/english.tagger.mdl to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.tagger.mdl
 # Copying ./save_dir/xlm-roberta-base/english/english.vocabs.json to ./save_dir/xlm-roberta-base/customized-ner/customized-ner.vocabs.json
