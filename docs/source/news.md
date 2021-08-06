@@ -5,7 +5,7 @@ What's new in Trankit v1.0.0? Let's check out below.
 ### Installation
 
 ```
-pip install trankit==1.0.1
+pip install trankit==1.1.0
 ```
 
 ### Trankit large
