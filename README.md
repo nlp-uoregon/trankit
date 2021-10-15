@@ -18,6 +18,18 @@
     </a>
 </div>
 
+[Our technical paper](https://arxiv.org/pdf/2101.03289.pdf) for Trankit won the Outstanding Demo Paper Award at [EACL 2021](https://2021.eacl.org/). Please cite the paper if you use Trankit in your research.
+
+```bibtex
+@inproceedings{nguyen2021trankit,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
+      author={Nguyen, Minh Van and Lai, Viet Dac and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
+      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
+      year={2021}
+}
+```
+This project has been supported by the Office of the Director of National Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA), via IARPA Contract No. 2019-19051600006 under the [Better Extraction from Text Towards Enhanced Retrieval (BETTER) Program](https://www.iarpa.gov/index.php/research-programs/better).
+
 ### :boom: :boom: :boom: Trankit v1.0.0 is out:
 
 * **90 new pretrained transformer-based pipelines for 56 languages**. The new pipelines are trained with XLM-Roberta large, which further boosts the performance significantly over 90 treebanks of the Universal Dependencies v2.5 corpus. Check out the new performance [here](https://trankit.readthedocs.io/en/latest/performance.html). This [page](https://trankit.readthedocs.io/en/latest/news.html#trankit-large) shows you how to use the new pipelines.
@@ -36,18 +48,6 @@ speed, making it *usable for general users*.
 In particular, for **English**, **Trankit is significantly better than Stanza** on sentence segmentation (**+9.36%**) and dependency parsing (**+5.07%** for UAS and **+5.81%** for LAS). For **Arabic**, our toolkit substantially improves sentence segmentation performance by **16.36%** while **Chinese** observes **14.50%** and **15.00%** improvement of UAS and LAS for dependency parsing. Detailed comparison between Trankit, Stanza, and other popular NLP toolkits (i.e., spaCy, UDPipe) in other languages can be found [here](https://trankit.readthedocs.io/en/latest/performance.html#universal-dependencies-v2-5) on [our documentation page](https://trankit.readthedocs.io/en/latest/index.html).
 
 We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoregon.edu/trankit
-
-[Our technical paper](https://arxiv.org/pdf/2101.03289.pdf) for Trankit will be presented at the EACL 2021 conference as a demonstration. Please cite the paper if you use Trankit in your research.
-
-```bibtex
-@inproceedings{nguyen2021trankit,
-      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
-      author={Nguyen, Minh Van and Lai, Viet and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
-      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
-      year={2021}
-}
-```
-
 
 ### Installation
 Trankit can be easily installed via one of the following methods:
