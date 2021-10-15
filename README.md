@@ -28,7 +28,6 @@
       year={2021}
 }
 ```
-This project has been supported by the Office of the Director of National Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA), via IARPA Contract No. 2019-19051600006 under the [Better Extraction from Text Towards Enhanced Retrieval (BETTER) Program](https://www.iarpa.gov/index.php/research-programs/better).
 
 ### :boom: :boom: :boom: Trankit v1.0.0 is out:
 
@@ -165,4 +164,6 @@ In case you want to share your customized pipelines with other users. Please cre
 After we receive your request, we will check and test your pipelines. Once everything is done, we would make the pipelines accessible by other users via new language codes.
 
 ### Acknowledgements
+This project has been supported by the Office of the Director of National Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA), via IARPA Contract No. 2019-19051600006 under the [Better Extraction from Text Towards Enhanced Retrieval (BETTER) Program](https://www.iarpa.gov/index.php/research-programs/better).
+
 We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza). To implement the language detection module, we leverage the [langid](https://github.com/saffsd/langid.py) library.
