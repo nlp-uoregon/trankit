@@ -157,9 +157,7 @@ class Pipeline:
             local_cache_dir = self._cache_dir
             
         master_config._cache_dir = os.path.abspath(local_cache_dir)
-
-        if not os.path.exists(master_config._cache_dir):
-            os.makedirs(master_config._cache_dir, exist_ok=True)
+        ensure_dir(master_config._cache_dir)
 
         master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
                                                                                cache_dir=os.path.join(
