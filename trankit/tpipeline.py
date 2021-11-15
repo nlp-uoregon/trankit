@@ -1,3 +1,4 @@
+import os
 from .config import config as master_config
 from .models.base_models import Multilingual_Embedding
 from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
@@ -173,7 +174,7 @@ class TPipeline:
             master_config.device = torch.device('cpu')
 
         master_config._save_dir = self._save_dir
-        master_config._cache_dir = self._save_dir
+        master_config._cache_dir = os.path.abspath(self._save_dir)
         ensure_dir(self._save_dir)
         self._config = master_config
         self._config.training = True
