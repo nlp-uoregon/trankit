@@ -152,9 +152,11 @@ class Pipeline:
             self._tagbatchsize = 12
 
         if self._cache_dir is None:
-            master_config._cache_dir = 'cache/trankit'
+            local_cache_dir = 'cache/trankit'
         else:
-            master_config._cache_dir = self._cache_dir
+            local_cache_dir = self._cache_dir
+            
+        master_config._cache_dir = os.path.abspath(local_cache_dir)
 
         if not os.path.exists(master_config._cache_dir):
             os.makedirs(master_config._cache_dir, exist_ok=True)
