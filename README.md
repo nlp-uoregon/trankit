@@ -35,7 +35,7 @@
 
 * **Auto Mode for multilingual pipelines**. In the Auto Mode, the language of the input will be automatically detected, enabling the multilingual pipelines to process the input without specifying its language. Check out how to turn on the Auto Mode [here](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Thank you [loretoparisi](https://github.com/loretoparisi) for your suggestion on this.
 
-* **Command-line interface** is now available to use. This helps users who are not familiar with Python programming language can use Trankit easily. Check out the tutorials on this [page](https://trankit.readthedocs.io/en/latest/commandline.html).
+* **Command-line interface** is now available to use. This helps users who are not familiar with Python programming language use Trankit easily. Check out the tutorials on this [page](https://trankit.readthedocs.io/en/latest/commandline.html).
 
 Trankit is a **light-weight Transformer-based Python** Toolkit for multilingual Natural Language Processing (NLP). It provides a trainable pipeline for fundamental NLP tasks over [100 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#trainable-languages), and 90 [downloadable](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) pretrained pipelines for [56 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names).
 
