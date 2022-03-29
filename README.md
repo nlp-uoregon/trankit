@@ -18,13 +18,24 @@
     </a>
 </div>
 
+[Our technical paper](https://arxiv.org/pdf/2101.03289.pdf) for Trankit won the Outstanding Demo Paper Award at [EACL 2021](https://2021.eacl.org/). Please cite the paper if you use Trankit in your research.
+
+```bibtex
+@inproceedings{nguyen2021trankit,
+      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
+      author={Nguyen, Minh Van and Lai, Viet Dac and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
+      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
+      year={2021}
+}
+```
+
 ### :boom: :boom: :boom: Trankit v1.0.0 is out:
 
 * **90 new pretrained transformer-based pipelines for 56 languages**. The new pipelines are trained with XLM-Roberta large, which further boosts the performance significantly over 90 treebanks of the Universal Dependencies v2.5 corpus. Check out the new performance [here](https://trankit.readthedocs.io/en/latest/performance.html). This [page](https://trankit.readthedocs.io/en/latest/news.html#trankit-large) shows you how to use the new pipelines.
 
 * **Auto Mode for multilingual pipelines**. In the Auto Mode, the language of the input will be automatically detected, enabling the multilingual pipelines to process the input without specifying its language. Check out how to turn on the Auto Mode [here](https://trankit.readthedocs.io/en/latest/news.html#auto-mode-for-multilingual-pipelines). Thank you [loretoparisi](https://github.com/loretoparisi) for your suggestion on this.
 
-* **Command-line interface** is now available to use. This helps users who are not familiar with Python programming language can use Trankit easily. Check out the tutorials on this [page](https://trankit.readthedocs.io/en/latest/commandline.html).
+* **Command-line interface** is now available to use. This helps users who are not familiar with Python programming language use Trankit easily. Check out the tutorials on this [page](https://trankit.readthedocs.io/en/latest/commandline.html).
 
 Trankit is a **light-weight Transformer-based Python** Toolkit for multilingual Natural Language Processing (NLP). It provides a trainable pipeline for fundamental NLP tasks over [100 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#trainable-languages), and 90 [downloadable](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names) pretrained pipelines for [56 languages](https://trankit.readthedocs.io/en/latest/pkgnames.html#pretrained-languages-their-code-names).
 
@@ -36,18 +47,6 @@ speed, making it *usable for general users*.
 In particular, for **English**, **Trankit is significantly better than Stanza** on sentence segmentation (**+9.36%**) and dependency parsing (**+5.07%** for UAS and **+5.81%** for LAS). For **Arabic**, our toolkit substantially improves sentence segmentation performance by **16.36%** while **Chinese** observes **14.50%** and **15.00%** improvement of UAS and LAS for dependency parsing. Detailed comparison between Trankit, Stanza, and other popular NLP toolkits (i.e., spaCy, UDPipe) in other languages can be found [here](https://trankit.readthedocs.io/en/latest/performance.html#universal-dependencies-v2-5) on [our documentation page](https://trankit.readthedocs.io/en/latest/index.html).
 
 We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoregon.edu/trankit
-
-[Our technical paper](https://arxiv.org/pdf/2101.03289.pdf) for Trankit will be presented at the EACL 2021 conference as a demonstration. Please cite the paper if you use Trankit in your research.
-
-```bibtex
-@inproceedings{nguyen2021trankit,
-      title={Trankit: A Light-Weight Transformer-based Toolkit for Multilingual Natural Language Processing}, 
-      author={Nguyen, Minh Van and Lai, Viet and Veyseh, Amir Pouran Ben and Nguyen, Thien Huu},
-      booktitle="Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: System Demonstrations",
-      year={2021}
-}
-```
-
 
 ### Installation
 Trankit can be easily installed via one of the following methods:
@@ -165,4 +164,6 @@ In case you want to share your customized pipelines with other users. Please cre
 After we receive your request, we will check and test your pipelines. Once everything is done, we would make the pipelines accessible by other users via new language codes.
 
 ### Acknowledgements
+This project has been supported by the Office of the Director of National Intelligence (ODNI), Intelligence Advanced Research Projects Activity (IARPA), via IARPA Contract No. 2019-19051600006 under the [Better Extraction from Text Towards Enhanced Retrieval (BETTER) Program](https://www.iarpa.gov/index.php/research-programs/better).
+
 We use [XLM-Roberta](https://arxiv.org/abs/1911.02116) and [Adapters](https://arxiv.org/abs/2005.00247) as our shared multilingual encoder for different tasks and languages. The [AdapterHub](https://github.com/Adapter-Hub/adapter-transformers) is used to implement our plug-and-play mechanism with Adapters. To speed up the development process, the implementations for the MWT expander and the lemmatizer are adapted from [Stanza](https://github.com/stanfordnlp/stanza). To implement the language detection module, we leverage the [langid](https://github.com/saffsd/langid.py) library.
