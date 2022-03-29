@@ -57,7 +57,7 @@ setup(
     ],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['numpy', 'protobuf', 'requests', 'torch>=1.6.0,<1.8.0', 'tqdm>=4.27', 'langid==1.1.6', 'filelock', 'tokenizers>=0.7.0', 'regex != 2019.12.17', 'packaging', 'sentencepiece', 'sacremoses', 'transformers'],
+    install_requires=['numpy', 'protobuf', 'requests', 'torch>=1.6.0', 'tqdm>=4.27', 'langid==1.1.6', 'filelock', 'tokenizers>=0.7.0', 'regex != 2019.12.17', 'packaging', 'sentencepiece', 'sacremoses', 'transformers'],
     entry_points={
     },
 )
