@@ -155,6 +155,7 @@ class TPipeline:
             treebank_name = 'UD_Japanese-like'  # use this special name to note that text is not split by spaces, similar to Japanese language.
         else:
             treebank_name = lang2treebank.get(self._lang, 'UD_{}-New'.format(self._lang))
+        tbname2training_id[treebank_name] = tbname2training_id[lang2treebank[self._lang]]
         lang2treebank[self._lang] = treebank_name
         treebank2lang[treebank_name] = self._lang
 

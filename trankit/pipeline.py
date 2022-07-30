@@ -666,6 +666,25 @@ class Pipeline:
         torch.cuda.empty_cache()
         return doc
 
+    def posdep_withID(self, input, is_sent = False):
+        #input format = { ID: tok_id, TEXT: tok_text, EXPANDED : if multiword}
+        if is_sent:
+            if self.auto_mode:
+                self._detect_lang_and_switch(text=' '.join( [ tok[TEXT] for tok in input]  ))
+                    
+            # input = [{ID: k_w[0], TEXT: k_w[1]} for k_w in input]
+            return {TOKENS: self._posdep_sent(in_sent=input), LANG: self.active_lang}
+           
+        else:
+            # switch to detected lang if auto mode is on
+            if self.auto_mode:
+                self._detect_lang_and_switch(text='\n'.join([' '.join( [ tok[TEXT] for tok in sent] ) for sent in input]))
+
+            input = [{ID: sid + 1, TOKENS: sent } for sid, sent in
+                         enumerate(input)]
+              
+            return {SENTENCES: self._posdep_doc(in_doc=input), LANG: self.active_lang}
+
     def posdep(self, input, is_sent=False):
         if is_sent:
             assert is_string(input) or is_list_strings(
@@ -859,6 +878,26 @@ class Pipeline:
         tagged_doc = get_output_doc(dposdep_doc, test_set.conllu_doc)
         torch.cuda.empty_cache()
         return tagged_doc
+
+    def lemmatize_withID(self, input, is_sent = False):
+        #input format = list of (ID, text), ID can be a tuple for multi word token
+        if is_sent:
+            if self.auto_mode:
+                self._detect_lang_and_switch(text=' '.join( [ tok[TEXT] for tok in input]  ))
+                    
+            # input = [{ID: k_w[0], TEXT: k_w[1]} for k_w in input]
+            return {TOKENS: self._lemmatize_sent(in_sent=input, obmit_tag=True), LANG: self.active_lang}
+           
+        else:
+            # switch to detected lang if auto mode is on
+            if self.auto_mode:
+                self._detect_lang_and_switch(text='\n'.join([' '.join( [ tok[TEXT] for tok in sent] ) for sent in input]))
+
+            input = [{ID: sid + 1, TOKENS: sent } for sid, sent in
+                         enumerate(input)]
+              
+            return {SENTENCES: self._lemmatize_doc(in_doc=input, obmit_tag=True), LANG: self.active_lang}
+
 
     def lemmatize(self, input, is_sent=False):
         if is_sent:

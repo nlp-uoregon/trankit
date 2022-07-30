@@ -252,7 +252,7 @@ def cached_path(
         # URL, so get it from the cache (downloading if necessary)
         output_path = get_from_cache(
             url_or_filename,
-            cache_dir=cache_dir,
+            cache_dir= "cache/xlm_roberta_model",
             force_download=force_download,
             proxies=proxies,
             resume_download=resume_download,

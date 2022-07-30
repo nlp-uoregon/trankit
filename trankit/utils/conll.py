@@ -113,8 +113,9 @@ class CoNLL:
         return doc_dict
 
     @staticmethod
-    def convert_dict(doc_dict):
-        """ Convert the dictionary format input data to the CoNLL-U format output data. This is the reverse function of
+    def convert_dict(doc_dict, use_expand = False):
+        """modified : add option use_expand to take into account multiword token (expanded) in the result from pipeline.py
+        Convert the dictionary format input data to the CoNLL-U format output data. This is the reverse function of
         `convert_conll`.
         Input: dictionary format data, which is a list of list of dictionaries for each token in each sentence in the data.
         Output: CoNLL-U format data, which is a list of list of list for each token in each sentence in the data.
@@ -125,6 +126,11 @@ class CoNLL:
             for token_dict in sent_dict:
                 token_conll = CoNLL.convert_token_dict(token_dict)
                 sent_conll.append(token_conll)
+
+                if type(token_dict[ID]) == tuple and use_expand:        
+                    for tok_dict in token_dict[EXPANDED]:
+                        tok_conll = CoNLL.convert_token_dict(tok_dict)
+                        sent_conll.append(tok_conll)
             doc_conll.append(sent_conll)
         return doc_conll
 

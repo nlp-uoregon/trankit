@@ -383,7 +383,7 @@ class LemmaWrapper:
                          type(token[ID]) == tuple and len(token[ID]) == 2)])
             dev_preds = self.trainer.predict_dict(
                 [[token[TEXT], token[UPOS]] for sentence in self.dev_batch.doc for token in sentence if
-                 not (type(token[ID]) == tuple and len(token[ID]) == 2)])
+                 not (type(token[ID]) == tuple and len(token[ID]) == 2 ) and LEMMA in token.keys()])
             self.dev_batch.doc = set_lemma(self.dev_batch.doc, dev_preds, training_mode=True)
             CoNLL.dict2conll(self.dev_batch.doc, self.system_pred_file)
             dev_f = get_ud_score(self.system_pred_file, self.gold_file)['Lemmas'].f1
