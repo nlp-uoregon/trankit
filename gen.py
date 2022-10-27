@@ -1,6 +1,3 @@
-from ctypes.wintypes import WPARAM
-
-
 file1 = "./kannada_dev.dat"
 file2 = "./kannada_train.txt"
 
