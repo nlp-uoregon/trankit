@@ -237,7 +237,8 @@ class Pipeline:
                 self._config.ner_vocabs[lang] = json.load(f)
         self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
         self._config.itos[lang][XPOS] = {v: k for k, v in vocabs[XPOS].items()}
-        self._config.itos[lang][FEATS] = {v: k for k, v in vocabs[FEATS].items()}
+        for i in CLASS_NAMES:
+            self._config.itos[lang][i] = {v: k for k,v in vocabs[i].items()}
         self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
         # add tokenizer
         self._tokenizer[lang] = TokenizerClassifier(self._config, treebank_name=lang2treebank[lang])
@@ -278,7 +279,8 @@ class Pipeline:
                 self._config.vocabs[treebank_name] = vocabs
             self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
             self._config.itos[lang][XPOS] = {v: k for k, v in vocabs[XPOS].items()}
-            self._config.itos[lang][FEATS] = {v: k for k, v in vocabs[FEATS].items()}
+            for i in CLASS_NAMES:
+                self._config.itos[lang][i] = {v: k for k,v in vocabs[i].items()}
             self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
             # ner vocabs
             if lang in langwithner:
@@ -731,19 +733,20 @@ class Pipeline:
                                 batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             batch_size = len(batch.word_num)
-
             word_reprs, cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
             predictions = self._tagger[self._config.active_lang].predict(batch, word_reprs, cls_reprs)
             predicted_upos = predictions[0]
             predicted_xpos = predictions[1]
-            predicted_feats = predictions[2]
+
+            predicted_feats = predictions[2:2+NUM_CLASS]
 
             predicted_upos = predicted_upos.data.cpu().numpy().tolist()
             predicted_xpos = predicted_xpos.data.cpu().numpy().tolist()
-            predicted_feats = predicted_feats.data.cpu().numpy().tolist()
+            for i in range(NUM_CLASS):
+                predicted_feats[i] = predicted_feats[i].data.cpu().numpy().tolist()
 
             # head, deprel
-            predicted_dep = predictions[3]
+            predicted_dep = predictions[2+NUM_CLASS]
             sentlens = [l + 1 for l in batch.word_num]
             head_seqs = [chuliu_edmonds_one_root(adj[:l, :l])[1:] for adj, l in
                          zip(predicted_dep[0], sentlens)]  # remove attachment for the root
@@ -770,10 +773,12 @@ class Pipeline:
                     pred_xpos_id = predicted_xpos[bid][i]
                     xpos_name = self._config.itos[self._config.active_lang][XPOS][pred_xpos_id]
                     test_set.conllu_doc[sentid][wordid][XPOS] = xpos_name
-                    # feats
-                    pred_feats_id = predicted_feats[bid][i]
-                    feats_name = self._config.itos[self._config.active_lang][FEATS][pred_feats_id]
-                    test_set.conllu_doc[sentid][wordid][FEATS] = feats_name
+                    # class1
+                    for j in range(NUM_CLASS):
+                        p_id = predicted_feats[j][bid][i]
+                        c_name = self._config.itos[self._config.active_lang][CLASS_NAMES[j]][p_id]
+                        test_set.conllu_doc[sentid][wordid][CLASS_NAMES[j]] = c_name
+                    
 
                     # head
                     test_set.conllu_doc[sentid][wordid][HEAD] = int(pred_tokens[bid][i][0])
@@ -795,7 +800,6 @@ class Pipeline:
             config=config
         )
         test_set.numberize()
-
         # load weights of tagger into the combined model
         self._load_adapter_weights(model_name='tagger')
 
@@ -808,19 +812,20 @@ class Pipeline:
                                 batch_size=eval_batch_size,
                                 shuffle=False, collate_fn=test_set.collate_fn):
             batch_size = len(batch.word_num)
-
             word_reprs, cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
             predictions = self._tagger[self._config.active_lang].predict(batch, word_reprs, cls_reprs)
+            
             predicted_upos = predictions[0]
             predicted_xpos = predictions[1]
-            predicted_feats = predictions[2]
+            predicted_feat = predictions[2:2+NUM_CLASS]
 
             predicted_upos = predicted_upos.data.cpu().numpy().tolist()
             predicted_xpos = predicted_xpos.data.cpu().numpy().tolist()
-            predicted_feats = predicted_feats.data.cpu().numpy().tolist()
 
+            for i in range(NUM_CLASS):
+                predicted_feat[i] = predicted_feat[i].data.cpu().numpy().tolist()
             # head, deprel
-            predicted_dep = predictions[3]
+            predicted_dep = predictions[2+NUM_CLASS]
             sentlens = [l + 1 for l in batch.word_num]
             head_seqs = [chuliu_edmonds_one_root(adj[:l, :l])[1:] for adj, l in
                          zip(predicted_dep[0], sentlens)]  # remove attachment for the root
@@ -840,6 +845,11 @@ class Pipeline:
                     wordid = batch.word_ids[bid][i]
 
                     # upos
+                    for j in range(NUM_CLASS):
+                        p_id = predicted_feat[j][bid][i]
+                        c_name = self._config.itos[self._config.active_lang][CLASS_NAMES[j]][p_id]
+                        test_set.conllu_doc[sentid][wordid][CLASS_NAMES[j]] = c_name
+
                     pred_upos_id = predicted_upos[bid][i]
                     upos_name = self._config.itos[self._config.active_lang][UPOS][pred_upos_id]
                     test_set.conllu_doc[sentid][wordid][UPOS] = upos_name
@@ -847,11 +857,7 @@ class Pipeline:
                     pred_xpos_id = predicted_xpos[bid][i]
                     xpos_name = self._config.itos[self._config.active_lang][XPOS][pred_xpos_id]
                     test_set.conllu_doc[sentid][wordid][XPOS] = xpos_name
-                    # feats
-                    pred_feats_id = predicted_feats[bid][i]
-                    feats_name = self._config.itos[self._config.active_lang][FEATS][pred_feats_id]
-                    test_set.conllu_doc[sentid][wordid][FEATS] = feats_name
-
+                   
                     # head
                     test_set.conllu_doc[sentid][wordid][HEAD] = int(pred_tokens[bid][i][0])
                     # deprel

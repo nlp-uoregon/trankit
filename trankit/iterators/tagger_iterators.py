@@ -3,25 +3,30 @@ from . import *
 # for sents
 instance_fields = [
     'sent_index',
-    'words', 'word_num', 'word_ids', 'word_span_idxs',
-    'piece_idxs', 'attention_masks', 'word_lens',
-    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs', 'feats_type_idxs',
+    'words', 'word_num', 'word_ids', 
+    'piece_idxs', 'attention_masks','word_span_idxs', 'word_lens',
+    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs', 
     'head_idxs', 'deprel_idxs', 'word_mask'
 ]
-
+H = len(instance_fields)
 batch_fields = [
-    'sent_index',
-    'words', 'word_num', 'word_ids', 'word_span_idxs',
-    'piece_idxs', 'attention_masks', 'word_lens',
-    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs', 'feats_type_idxs',
-    'upos_ids', 'xpos_ids', 'feats_ids',
+    'sent_index','word_ids',
+    'words', 'word_num',  
+    'piece_idxs', 'attention_masks', 'word_lens','word_span_idxs',
+    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs',
+    'upos_ids', 'xpos_ids',
     'head_idxs', 'deprel_idxs', 'word_mask'
 ]
+B = len(batch_fields)
 
+for i in CLASS_NAMES:  #new_idxs
+    instance_fields += [i+"_type_idxs"]
+    batch_fields += [i+"_type_idxs"]
+for i in CLASS_NAMES:  #new_idxs
+    batch_fields += [i+"_ids"  ]
 Instance = namedtuple('Instance', field_names=instance_fields)
 
 Batch = namedtuple('Batch', field_names=batch_fields)
-
 
 class TaggerDatasetLive(Dataset):
     def __init__(self, tokenized_doc, wordpiece_splitter, config):
@@ -69,18 +74,18 @@ class TaggerDatasetLive(Dataset):
             if len(flat_pieces) > self.max_input_length - 2:
                 sub_insts = []
                 cur_inst = deepcopy(inst)
-                for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL, 'flat_pieces']:
+                for key in ['words', 'word_ids', LEMMA, UPOS, XPOS]+CLASS_NAMES+[HEAD, DEPREL, 'flat_pieces']:
                     cur_inst[key] = []
 
                 for i in range(len(inst['words'])):
-                    for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL]:
+                    for key in ['words', 'word_ids', LEMMA, UPOS, XPOS]+CLASS_NAMES+[ HEAD, DEPREL]:
                         cur_inst[key].append(inst[key][i])
                     cur_inst['flat_pieces'].extend(pieces[i])
                     if len(cur_inst['flat_pieces']) >= self.max_input_length - 10:
                         sub_insts.append(cur_inst)
 
                         cur_inst = deepcopy(inst)
-                        for key in ['words', 'word_ids', LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL, 'flat_pieces']:
+                        for key in ['words', 'word_ids', LEMMA, UPOS, XPOS]+CLASS_NAMES+[ HEAD, DEPREL, 'flat_pieces']:
                             cur_inst[key] = []
 
                 if len(cur_inst['flat_pieces']) > 0:
@@ -129,7 +134,8 @@ class TaggerDatasetLive(Dataset):
             edit_type_idxs = [self.vocabs[LEMMA][edit] for edit in inst[LEMMA]]
             upos_type_idxs = [self.vocabs[UPOS][upos] for upos in inst[UPOS]]
             xpos_type_idxs = [self.vocabs[XPOS][xpos] for xpos in inst[XPOS]]
-            feats_type_idxs = [self.vocabs[FEATS][feats] for feats in inst[FEATS]]
+
+           
 
             assert len(edit_type_idxs) == len(inst['words'])
 
@@ -138,23 +144,26 @@ class TaggerDatasetLive(Dataset):
             deprel_idxs = [self.vocabs[DEPREL][deprel] for deprel in inst[DEPREL]]
             word_mask = [0] * (len(inst['words']) + 1)
 
-            instance = Instance(
-                sent_index=inst['sent_index'],
-                word_ids=inst['word_ids'],
-                words=inst['words'],
-                word_num=len(inst['words']),
-                piece_idxs=piece_idxs,
-                attention_masks=attn_masks,
-                word_span_idxs=word_span_idxs,
-                word_lens=word_lens,
-                edit_type_idxs=edit_type_idxs,
-                upos_type_idxs=upos_type_idxs,
-                xpos_type_idxs=xpos_type_idxs,
-                feats_type_idxs=feats_type_idxs,
-                head_idxs=head_idxs,
-                deprel_idxs=deprel_idxs,
-                word_mask=word_mask
-            )
+            args = [
+                inst['sent_index'],
+                inst['words'],
+                len(inst['words']),
+                inst['word_ids'],
+                piece_idxs,
+                attn_masks,
+                word_span_idxs,
+                word_lens,
+                edit_type_idxs,
+                upos_type_idxs,
+                xpos_type_idxs,
+                head_idxs,
+                deprel_idxs,
+                word_mask
+            ]
+
+            for i in CLASS_NAMES:
+                args+=[[self.vocabs[i][x] for x in inst[i]]]
+            instance = Instance(*args)
             data.append(instance)
         self.data = data
 
@@ -173,9 +182,13 @@ class TaggerDatasetLive(Dataset):
         batch_edit_type_idxs = []
         batch_upos_type_idxs = []
         batch_xpos_type_idxs = []
-        batch_feats_type_idxs = []
-
-        batch_upos_ids, batch_xpos_ids, batch_feats_ids = [], [], []
+        batch_upos_ids, batch_xpos_ids = [],  []
+        
+        NEW_IDS=[]
+        NEW_TYPE_IDXS=[]
+        for i in range(NUM_CLASS):
+            NEW_IDS+=[[]]
+            NEW_TYPE_IDXS+=[[]]
 
         batch_head_ids, batch_deprel_ids, batch_word_mask = [], [], []
 
@@ -191,13 +204,13 @@ class TaggerDatasetLive(Dataset):
             # lemmatization
             batch_edit_type_idxs.extend(inst.edit_type_idxs +
                                         [-100] * (max_word_num - inst.word_num))
-            # upos, xpos, feats
             batch_upos_type_idxs.extend(inst.upos_type_idxs +
                                         [-100] * (max_word_num - inst.word_num))
             batch_xpos_type_idxs.extend(inst.xpos_type_idxs +
                                         [-100] * (max_word_num - inst.word_num))
-            batch_feats_type_idxs.extend(inst.feats_type_idxs +
-                                         [-100] * (max_word_num - inst.word_num))
+            for i in range(NUM_CLASS):
+                NEW_TYPE_IDXS[i].extend(inst[H+i]+[-100] * (max_word_num - inst.word_num))
+            
             # head, deprel
             batch_head_ids.append(inst.head_idxs + [0] * (max_word_num - inst.word_num))
             batch_deprel_ids.append(inst.deprel_idxs + [0] * (max_word_num - inst.word_num))
@@ -205,7 +218,8 @@ class TaggerDatasetLive(Dataset):
             # ids for feature building
             batch_upos_ids.append(inst.upos_type_idxs + [0] * (max_word_num - inst.word_num))
             batch_xpos_ids.append(inst.xpos_type_idxs + [0] * (max_word_num - inst.word_num))
-            batch_feats_ids.append(inst.feats_type_idxs + [0] * (max_word_num - inst.word_num))
+            for i in range(NUM_CLASS):
+                NEW_IDS[i].append(inst[H+i]+[0]*(max_word_num-inst.word_num))
 
         batch_piece_idxs = torch.tensor(batch_piece_idxs, dtype=torch.long, device=self.config.device)
         batch_attention_masks = torch.tensor(batch_attention_masks, dtype=torch.float16, device=self.config.device)
@@ -214,7 +228,8 @@ class TaggerDatasetLive(Dataset):
 
         batch_upos_type_idxs = torch.tensor(batch_upos_type_idxs, dtype=torch.long, device=self.config.device)
         batch_xpos_type_idxs = torch.tensor(batch_xpos_type_idxs, dtype=torch.long, device=self.config.device)
-        batch_feats_type_idxs = torch.tensor(batch_feats_type_idxs, dtype=torch.long, device=self.config.device)
+        for i in range(NUM_CLASS):
+            NEW_TYPE_IDXS[i] = torch.tensor(NEW_TYPE_IDXS[i], dtype=torch.long, device=self.config.device)
 
         batch_upos_ids = torch.tensor(batch_upos_ids, dtype=torch.long, device=self.config.device)
         batch_xpos_ids = torch.tensor(batch_xpos_ids, dtype=torch.long, device=self.config.device)
@@ -223,27 +238,32 @@ class TaggerDatasetLive(Dataset):
         batch_deprel_ids = torch.tensor(batch_deprel_ids, dtype=torch.long, device=self.config.device)
         batch_word_mask = torch.tensor(batch_word_mask, dtype=torch.bool, device=self.config.device)
 
-        return Batch(
-            sent_index=batch_sent_index,
-            word_ids=batch_word_ids,
-            words=batch_words,
-            word_num=batch_word_num,
-            piece_idxs=batch_piece_idxs,
-            attention_masks=batch_attention_masks,
-            word_lens=batch_word_lens,
-            word_span_idxs=batch_word_span_idxs,
-            edit_type_idxs=batch_edit_type_idxs,
-            upos_type_idxs=batch_upos_type_idxs,
-            xpos_type_idxs=batch_xpos_type_idxs,
-            feats_type_idxs=batch_feats_type_idxs,
-            upos_ids=batch_upos_ids,
-            xpos_ids=batch_xpos_ids,
-            feats_ids=batch_xpos_ids,
-            head_idxs=batch_head_ids,
-            deprel_idxs=batch_deprel_ids,
-            word_mask=batch_word_mask
-        )
 
+        args = [
+            batch_sent_index,
+            batch_word_ids,
+            batch_words,
+            batch_word_num,
+            batch_piece_idxs,
+            batch_attention_masks,
+            batch_word_lens,
+            batch_word_span_idxs,
+            batch_edit_type_idxs,
+            batch_upos_type_idxs,
+            batch_xpos_type_idxs,
+            batch_upos_ids,
+            batch_xpos_ids,
+            batch_head_ids,
+            batch_deprel_ids,
+            batch_word_mask
+        ]
+        print(len(args))
+        print(len(NEW_TYPE_IDXS))
+        print(len(NEW_IDS))
+        args = args + NEW_TYPE_IDXS +NEW_IDS
+        
+        return Batch(*args)
+        
 
 class TaggerDataset(Dataset):
     def __init__(self, config, input_conllu, gold_conllu, evaluate=False):
@@ -283,6 +303,7 @@ class TaggerDataset(Dataset):
                 self.config.max_input_length,
                 self.input_conllu
             )
+            
 
         print('Loaded {} entries from {}'.format(len(self), self.input_conllu))
 
@@ -318,11 +339,9 @@ class TaggerDataset(Dataset):
             attn_masks = [1] * len(piece_idxs)
             piece_idxs = piece_idxs
             assert len(piece_idxs) > 0
-
             edit_type_idxs = [self.vocabs[LEMMA][edit] for edit in inst[LEMMA]]
             upos_type_idxs = [self.vocabs[UPOS][upos] for upos in inst[UPOS]]
             xpos_type_idxs = [self.vocabs[XPOS][xpos] for xpos in inst[XPOS]]
-            feats_type_idxs = [self.vocabs[FEATS][feats] for feats in inst[FEATS]]
 
             assert len(edit_type_idxs) == len(inst['words'])
 
@@ -330,24 +349,33 @@ class TaggerDataset(Dataset):
             head_idxs = [head for head in inst[HEAD]]
             deprel_idxs = [self.vocabs[DEPREL][deprel] for deprel in inst[DEPREL]]
             word_mask = [0] * (len(inst['words']) + 1)
-
-            instance = Instance(
-                sent_index=inst['sent_index'],
-                word_ids=inst['word_ids'],
-                words=inst['words'],
-                word_num=len(inst['words']),
-                piece_idxs=piece_idxs,
-                attention_masks=attn_masks,
-                word_span_idxs=word_span_idxs,
-                word_lens=word_lens,
-                edit_type_idxs=edit_type_idxs,
-                upos_type_idxs=upos_type_idxs,
-                xpos_type_idxs=xpos_type_idxs,
-                feats_type_idxs=feats_type_idxs,
-                head_idxs=head_idxs,
-                deprel_idxs=deprel_idxs,
-                word_mask=word_mask
-            )
+            args = [
+                inst['sent_index'],
+                inst['words'],
+                len(inst['words']),
+                inst['word_ids'],
+                piece_idxs,
+                attn_masks,
+                word_span_idxs,
+                word_lens,
+                edit_type_idxs,
+                upos_type_idxs,
+                xpos_type_idxs,
+                head_idxs,
+                deprel_idxs,
+                word_mask
+            ]
+            for i in (CLASS_NAMES):
+                try:
+                    args+=[[self.vocabs[i][x] for x in inst[i]]]
+                except:
+                    print(self.vocabs[i])
+                    print(inst[i])
+                    for x in inst[i]:
+                        print(x)
+                        print(self.vocabs[i][x])
+                    print(2/0)
+            instance = Instance(*args)
             data.append(instance)
         self.data = data
 
@@ -366,10 +394,14 @@ class TaggerDataset(Dataset):
         batch_edit_type_idxs = []
         batch_upos_type_idxs = []
         batch_xpos_type_idxs = []
-        batch_feats_type_idxs = []
+        NEW_IDS=[]
+        NEW_TYPE_IDXS=[]
+        for i in range(NUM_CLASS):
+            NEW_IDS+=[[]]
+            NEW_TYPE_IDXS+=[[]]
 
-        batch_upos_ids, batch_xpos_ids, batch_feats_ids = [], [], []
 
+        batch_upos_ids, batch_xpos_ids = [], []
         batch_head_ids, batch_deprel_ids, batch_word_mask = [], [], []
 
         max_word_num = max(batch_word_num)
@@ -384,13 +416,10 @@ class TaggerDataset(Dataset):
             # lemmatization
             batch_edit_type_idxs.extend(inst.edit_type_idxs +
                                         [-100] * (max_word_num - inst.word_num))
-            # upos, xpos, feats
-            batch_upos_type_idxs.extend(inst.upos_type_idxs +
-                                        [-100] * (max_word_num - inst.word_num))
-            batch_xpos_type_idxs.extend(inst.xpos_type_idxs +
-                                        [-100] * (max_word_num - inst.word_num))
-            batch_feats_type_idxs.extend(inst.feats_type_idxs +
-                                         [-100] * (max_word_num - inst.word_num))
+            batch_upos_type_idxs.extend(inst.upos_type_idxs + [-100] * (max_word_num - inst.word_num))
+            batch_xpos_type_idxs.extend(inst.xpos_type_idxs + [-100] * (max_word_num - inst.word_num))
+            for i in range(NUM_CLASS):
+                NEW_TYPE_IDXS[i].extend(inst[H+i]+[-100] * (max_word_num - inst.word_num))
             # head, deprel
             batch_head_ids.append(inst.head_idxs + [0] * (max_word_num - inst.word_num))
             batch_deprel_ids.append(inst.deprel_idxs + [0] * (max_word_num - inst.word_num))
@@ -398,7 +427,9 @@ class TaggerDataset(Dataset):
             # ids for feature building
             batch_upos_ids.append(inst.upos_type_idxs + [0] * (max_word_num - inst.word_num))
             batch_xpos_ids.append(inst.xpos_type_idxs + [0] * (max_word_num - inst.word_num))
-            batch_feats_ids.append(inst.feats_type_idxs + [0] * (max_word_num - inst.word_num))
+            
+            for i in range(NUM_CLASS):
+                NEW_IDS[i].append(inst[H+i]+[0]* (max_word_num - inst.word_num))
 
         batch_piece_idxs = torch.tensor(batch_piece_idxs, dtype=torch.long, device=self.config.device)
         batch_attention_masks = torch.tensor(batch_attention_masks, dtype=torch.float16, device=self.config.device)
@@ -407,7 +438,9 @@ class TaggerDataset(Dataset):
 
         batch_upos_type_idxs = torch.tensor(batch_upos_type_idxs, dtype=torch.long, device=self.config.device)
         batch_xpos_type_idxs = torch.tensor(batch_xpos_type_idxs, dtype=torch.long, device=self.config.device)
-        batch_feats_type_idxs = torch.tensor(batch_feats_type_idxs, dtype=torch.long, device=self.config.device)
+
+        for i in range(NUM_CLASS):
+            NEW_TYPE_IDXS[i] = torch.tensor(NEW_TYPE_IDXS[i], dtype=torch.long, device=self.config.device)
 
         batch_upos_ids = torch.tensor(batch_upos_ids, dtype=torch.long, device=self.config.device)
         batch_xpos_ids = torch.tensor(batch_xpos_ids, dtype=torch.long, device=self.config.device)
@@ -416,23 +449,24 @@ class TaggerDataset(Dataset):
         batch_deprel_ids = torch.tensor(batch_deprel_ids, dtype=torch.long, device=self.config.device)
         batch_word_mask = torch.tensor(batch_word_mask, dtype=torch.bool, device=self.config.device)
 
-        return Batch(
-            sent_index=batch_sent_index,
-            word_ids=batch_word_ids,
-            words=batch_words,
-            word_num=batch_word_num,
-            piece_idxs=batch_piece_idxs,
-            attention_masks=batch_attention_masks,
-            word_lens=batch_word_lens,
-            word_span_idxs=batch_word_span_idxs,
-            edit_type_idxs=batch_edit_type_idxs,
-            upos_type_idxs=batch_upos_type_idxs,
-            xpos_type_idxs=batch_xpos_type_idxs,
-            feats_type_idxs=batch_feats_type_idxs,
-            upos_ids=batch_upos_ids,
-            xpos_ids=batch_xpos_ids,
-            feats_ids=batch_xpos_ids,
-            head_idxs=batch_head_ids,
-            deprel_idxs=batch_deprel_ids,
-            word_mask=batch_word_mask
-        )
+        args = [
+            batch_sent_index,
+            batch_word_ids,
+            batch_words,
+            batch_word_num,
+            batch_piece_idxs,
+            batch_attention_masks,
+            batch_word_lens,
+            batch_word_span_idxs,
+            batch_edit_type_idxs,
+            batch_upos_type_idxs,
+            batch_xpos_type_idxs,
+            batch_upos_ids,
+            batch_xpos_ids,
+            batch_head_ids,
+            batch_deprel_ids,
+            batch_word_mask
+        ]
+        args = args + NEW_TYPE_IDXS + NEW_IDS
+        
+        return Batch(*args)

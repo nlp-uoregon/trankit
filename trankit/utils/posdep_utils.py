@@ -1,3 +1,4 @@
+from hashlib import new
 from .conll import *
 
 
@@ -42,10 +43,11 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
             LEMMA: [],
             UPOS: [],
             XPOS: [],
-            FEATS: [],
             HEAD: [],
             DEPREL: []
         }
+        for i in CLASS_NAMES:
+            new_ex[i] = []
         conllu_doc[sid] = {
             'mwts': []
         }
@@ -68,7 +70,6 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
 
                     upos = '_'
                     xpos = '_'
-                    feats = '_'
 
                     head = 0
                     deprel = '_'
@@ -85,7 +86,8 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
                     new_ex[LEMMA].append(edit_operation)
                     new_ex[UPOS].append(upos)
                     new_ex[XPOS].append(xpos)
-                    new_ex[FEATS].append(feats)
+                    for i in CLASS_NAMES:
+                        new_ex[i].append("_")
 
                     new_ex[HEAD].append(head)
                     new_ex[DEPREL].append(deprel)
@@ -96,7 +98,6 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
 
                 upos = '_'
                 xpos = '_'
-                feats = '_'
 
                 head = 0
                 deprel = '_'
@@ -113,7 +114,9 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
                 new_ex[LEMMA].append(edit_operation)
                 new_ex[UPOS].append(upos)
                 new_ex[XPOS].append(xpos)
-                new_ex[FEATS].append(feats)
+
+                for i in CLASS_NAMES:
+                    new_ex[i].append('_')
 
                 new_ex[HEAD].append(head)
                 new_ex[DEPREL].append(deprel)
@@ -131,12 +134,15 @@ def get_examples_from_conllu(wordpiece_splitter, max_input_length, tokenized_doc
 
 def tget_examples_from_conllu(tokenizer, max_input_length, conllu_file, get_vocab=False):
     vocabs = {
-        LEMMA: {}, UPOS: {'_': 0}, XPOS: {'_': 0}, FEATS: {'_': 0}, HEAD: {'_': 0},
-        DEPREL: {
-            '_': 0
-        },
+        LEMMA: {}, 
+        UPOS: {'_': 0}, 
+        XPOS: {'_': 0},
+        HEAD: {'_': 0},
+        DEPREL: {'_': 0},
         DEPS: {'_': 0}
     }
+    for i in CLASS_NAMES:
+        vocabs[i] = {'_':0}
     conllu_sentences = CoNLL.conll2dict(input_file=conllu_file)
 
     examples = []
@@ -151,10 +157,11 @@ def tget_examples_from_conllu(tokenizer, max_input_length, conllu_file, get_voca
             LEMMA: [],
             UPOS: [],
             XPOS: [],
-            FEATS: [],
             HEAD: [],
             DEPREL: []
         }
+        for i in CLASS_NAMES:
+            new_ex[i] = []
         conllu_doc[sid] = {
             'mwts': []
         }
@@ -176,7 +183,6 @@ def tget_examples_from_conllu(tokenizer, max_input_length, conllu_file, get_voca
                 if get_vocab:
                     upos = token.get(UPOS, '_')
                     xpos = token.get(XPOS, '_')
-                    feats = token.get(FEATS, '_')
                     edit_operation = '0'
 
                     head = token.get(HEAD, 0)
@@ -185,14 +191,18 @@ def tget_examples_from_conllu(tokenizer, max_input_length, conllu_file, get_voca
                     vocabs[LEMMA][edit_operation] = vocabs[LEMMA].get(edit_operation, len(vocabs[LEMMA]))
                     vocabs[UPOS][upos] = vocabs[UPOS].get(upos, len(vocabs[UPOS]))
                     vocabs[XPOS][xpos] = vocabs[XPOS].get(xpos, len(vocabs[XPOS]))
-                    vocabs[FEATS][feats] = vocabs[FEATS].get(feats, len(vocabs[FEATS]))
+                    for i in CLASS_NAMES:
+                        x = token.get(i,'_')
+                        vocabs[i][x] = vocabs[i].get(x,len(vocabs[i]))
+                        new_ex[i].append(x)
                     vocabs[DEPREL][deprel] = vocabs[DEPREL].get(deprel, len(vocabs[DEPREL]))
                 else:
                     edit_operation = '0'
 
                     upos = '_'
                     xpos = '_'
-                    feats = '_'
+                    for i in CLASS_NAMES:
+                        new_ex[i].append( '_')
 
                     head = 0
                     deprel = '_'
@@ -209,7 +219,6 @@ def tget_examples_from_conllu(tokenizer, max_input_length, conllu_file, get_voca
                 new_ex[LEMMA].append(edit_operation)
                 new_ex[UPOS].append(upos)
                 new_ex[XPOS].append(xpos)
-                new_ex[FEATS].append(feats)
 
                 new_ex[HEAD].append(head)
                 new_ex[DEPREL].append(deprel)

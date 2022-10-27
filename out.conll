@@ -1,0 +1,10 @@
+1	ಬಗೆಗೆ	_	unk	NULL	|case-o|	|vib-ಗೆ|	|tam-geV|	|pers-3|	|gen-|	|num-sg|	3	k7	_	_
+2	ದೃಢವಾಗಿ	_	cc__ccd	PR__PRC	|case-|	|vib-ಅವ್+ಆ+ಆಗು+ಇ|	|tam-av+A+Agu+i|	|pers-|	|gen-|	|num-|	3	adv	_	_
+3	ಯೋಚಿಸಿ	_	cc__ccs	RD__ECH	|case-|	|vib-ಇಸ್+ಉ|	|tam-is+u|	|pers-|	|gen-|	|num-|	5	vmod	_	_
+4	ನಿರ್ಣಯವನ್ನು	_	v__vm__vnf	QO	|case-o|	|vib-ಅವ್+ಅ+ಅನ್ನು|	|tam-av+a+annu|	|pers-3|	|gen-|	|num-sg|	5	k2	_	_
+5	ವಿನಹ	_	punc	RD__SYM	|case-d|	|vib-0|	|tam-0|	|pers-|	|gen-|	|num-|	7	vmod	_	_
+6	ಪ್ರವೃತ್ತಿ	_	v__vm__vnf	NULL	|case-d|	|vib-0|	|tam-0|	|pers-3|	|gen-|	|num-sg|	7	k2	_	_
+7	ಉಳ್ಳವನು	_	rd__punc	QO	|case-|	|vib-ಅನ್+ಉ|	|tam-an+u|	|pers-3|	|gen-m|	|num-sg|	8	k1	_	_
+8	ಆಗಬಾರದು	_	punc	V__VM__VF	|case-|	|vib-ಅ+ಬಾರದು|	|tam-a+bAraxu|	|pers-|	|gen-|	|num-|	0	root	_	_
+9	.	_	n__nn	RP__NEG	|case-|	|vib-|	|tam-|	|pers-|	|gen-|	|num-|	8	rsym_eos	_	_
+

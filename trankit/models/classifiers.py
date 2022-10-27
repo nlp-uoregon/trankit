@@ -4,6 +4,30 @@ from trankit.layers.crf_layer import CRFLoss, viterbi_decode
 from ..utils.base_utils import *
 from ..utils.conll import *
 
+instance_fields = [
+    'sent_index',
+    'words', 'word_num', 'word_ids', 
+    'piece_idxs', 'attention_masks','word_span_idxs', 'word_lens',
+    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs', 
+    'head_idxs', 'deprel_idxs', 'word_mask'
+]
+H = len(instance_fields)
+batch_fields = [
+    'sent_index','word_ids',
+    'words', 'word_num',  
+    'piece_idxs', 'attention_masks', 'word_lens','word_span_idxs',
+    'edit_type_idxs', 'upos_type_idxs', 'xpos_type_idxs',
+    'upos_ids', 'xpos_ids',
+    'head_idxs', 'deprel_idxs', 'word_mask'
+]
+B = len(batch_fields)
+
+for i in CLASS_NAMES:  #new_idxs
+    instance_fields += [i+"_type_idxs"]
+    batch_fields += [i+"_type_idxs"]
+for i in CLASS_NAMES:  #new_idxs
+    batch_fields += [i+"_ids"  ]
+
 
 class NERClassifier(nn.Module):
     def __init__(self, config, language):
@@ -73,7 +97,9 @@ class PosDepClassifier(nn.Module):
         # pos tagging
         self.upos_ffn = nn.Linear(self.xlmr_dim, len(self.vocabs[UPOS]))
         self.xpos_ffn = nn.Linear(self.xlmr_dim + 50, len(self.vocabs[XPOS]))
-        self.feats_ffn = nn.Linear(self.xlmr_dim, len(self.vocabs[FEATS]))
+
+        for i in range(NUM_CLASS):
+            setattr(self, CLASS_NAMES[i]+"_ffn", nn.Linear(self.xlmr_dim, len(self.vocabs[CLASS_NAMES[i]])))
 
         self.down_dim = self.xlmr_dim // 4
         self.down_project = nn.Linear(self.xlmr_dim, self.down_dim)
@@ -94,7 +120,6 @@ class PosDepClassifier(nn.Module):
                                                                      '{}.tagger.mdl'.format(
                                                                          language)), map_location=self.config.device)[
                 'adapters']
-
             for name, value in self.pretrained_tagger_weights.items():
                 if name in self.initialized_weights:
                     self.initialized_weights[name] = value
@@ -112,13 +137,22 @@ class PosDepClassifier(nn.Module):
         )
         xpos_scores = self.xpos_ffn(xpos_reprs)
         xpos_scores = xpos_scores.view(-1, len(self.vocabs[XPOS]))
-        # feats
-        feats_scores = self.feats_ffn(word_reprs)
-        feats_scores = feats_scores.view(-1, len(self.vocabs[FEATS]))
+        
+        scores = []
+        for i in range(NUM_CLASS):
+            x = getattr(self,CLASS_NAMES[i]+"_ffn").cuda()(word_reprs)
+            scores += [x.view(-1,len(self.vocabs[CLASS_NAMES[i]]))]
 
         loss = self.criteria(upos_scores, batch.upos_type_idxs) + \
-               self.criteria(xpos_scores, batch.xpos_type_idxs) + \
-               self.criteria(feats_scores, batch.feats_type_idxs)
+               self.criteria(xpos_scores, batch.xpos_type_idxs) 
+        loss = self.criteria(upos_scores, batch.upos_type_idxs) + \
+               self.criteria(xpos_scores, batch.xpos_type_idxs) 
+        if(ignore_upos_xpos):
+            loss = 0
+        for i in range(NUM_CLASS):
+            y = CLASS_NAMES[i]+"_type_idxs"
+            loss += self.criteria(scores[i],batch[16+i])
+            
 
         # head
         dep_reprs = torch.cat(
@@ -148,6 +182,7 @@ class PosDepClassifier(nn.Module):
         return loss
 
     def predict(self, batch, word_reprs, cls_reprs):
+
         # upos
         upos_scores = self.upos_ffn(word_reprs)
         predicted_upos = torch.argmax(upos_scores, dim=2)
@@ -158,9 +193,11 @@ class PosDepClassifier(nn.Module):
         # xpos
         xpos_scores = self.xpos_ffn(xpos_reprs)
         predicted_xpos = torch.argmax(xpos_scores, dim=2)
-        # feats
-        feats_scores = self.feats_ffn(word_reprs)
-        predicted_feats = torch.argmax(feats_scores, dim=2)
+        P = []
+        for i in range(NUM_CLASS):
+            x = getattr(self,CLASS_NAMES[i]+"_ffn").cuda()(word_reprs)
+            P += [torch.argmax(x,dim=2)]
+        
 
         # head
         dep_reprs = torch.cat(
@@ -177,7 +214,7 @@ class PosDepClassifier(nn.Module):
         dep_preds = []
         dep_preds.append(F.log_softmax(unlabeled_scores, 2).detach().cpu().numpy())
         dep_preds.append(deprel_scores.max(3)[1].detach().cpu().numpy())
-        return predicted_upos, predicted_xpos, predicted_feats, dep_preds
+        return [predicted_upos, predicted_xpos ] + P  +[dep_preds]
 
 
 class TokenizerClassifier(nn.Module):

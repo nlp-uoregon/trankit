@@ -22,8 +22,6 @@ def set_lemma(doc, preds, obmit_tag=None, training_mode=False):
                             del token[UPOS]
                         if XPOS in token:
                             del token[XPOS]
-                        if FEATS in token:
-                            del token[FEATS]
                         if HEAD in token:
                             del token[HEAD]
                         if DEPREL in token:
@@ -38,8 +36,7 @@ def set_lemma(doc, preds, obmit_tag=None, training_mode=False):
                                 del word[UPOS]
                             if XPOS in word:
                                 del word[XPOS]
-                            if FEATS in token:
-                                del token[FEATS]
+                            
                             if HEAD in word:
                                 del word[HEAD]
                             if DEPREL in word:
@@ -344,8 +341,9 @@ class LemmaWrapper:
         self.gold_file = self.config.dev_conllu_fpath
 
         in_dev_file = os.path.join(self.config._save_dir, 'preds', 'tagger.dev.conllu')
-        if not os.path.exists(in_dev_file):
-            in_dev_file = self.config.dev_conllu_fpath
+        # if not os.path.exists(in_dev_file):
+        #     
+        in_dev_file = self.config.dev_conllu_fpath
 
         train_doc = CoNLL.conll2dict(input_file=self.train_file)
         self.train_batch = LemmaDataLoader(train_doc, args['batch_size'], args, evaluation=False, training_mode=True)

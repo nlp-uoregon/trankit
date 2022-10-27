@@ -5,17 +5,19 @@ Date: 2021/01/06
 """
 Utility functions for the loading and conversion of CoNLL-format files.
 """
+from ctypes.wintypes import PINT
 import os
 import io
+from .custom_classifiers import *
 
-FIELD_NUM = 10
+FIELD_NUM = 10 + NUM_CLASS -1
 
 ID = 'id'
 TEXT = 'text'
 LEMMA = 'lemma'
 UPOS = 'upos'
 XPOS = 'xpos'
-FEATS = 'feats'
+NEW_CLASSIFIERS = 'new_classifiers'
 HEAD = 'head'
 DEPREL = 'deprel'
 DEPS = 'deps'
@@ -28,8 +30,21 @@ TOKENS = 'tokens'
 NER = 'ner'
 LANG = 'lang'
 
-FIELD_TO_IDX = {ID: 0, TEXT: 1, LEMMA: 2, UPOS: 3, XPOS: 4, FEATS: 5, HEAD: 6, DEPREL: 7, DEPS: 8, MISC: 9}
+FIELD_TO_IDX = {
+    ID : 0,
+    TEXT : 1, 
+    LEMMA : 2, 
+    UPOS : 3, 
+    XPOS : 4, 
+    HEAD : 5+NUM_CLASS, 
+    DEPREL : 6+NUM_CLASS, 
+    DEPS : 7+NUM_CLASS, 
+    MISC : 8+NUM_CLASS,
+    NEW_CLASSIFIERS : 5
+}
 
+for i in range(NUM_CLASS):
+    FIELD_TO_IDX[CLASS_NAMES[i]] = 5 + i
 
 class CoNLL:
 
@@ -54,8 +69,8 @@ class CoNLL:
                 array = line.split('\t')
                 if ignore_gapping and '.' in array[0]:
                     continue
-                assert len(array) == FIELD_NUM, \
-                    f"Cannot parse CoNLL line: expecting {FIELD_NUM} fields, {len(array)} found."
+                assert len(array) == 10, \
+                    f"Cannot parse CoNLL line: expecting {FIELD_NUM} , {NUM_CLASS} fields, {len(array)} found. {array}"
                 sent += [array]
         if len(sent) > 0:
             doc.append(sent)
@@ -82,9 +97,16 @@ class CoNLL:
         Input: a list of all CoNLL-U fields for the token.
         Output: a dictionary that maps from field name to value.
         """
+        
         token_dict = {}
         for field in FIELD_TO_IDX:
-            value = token_conll[FIELD_TO_IDX[field]]
+            n= FIELD_TO_IDX[field]
+            if(n>=FIELD_TO_IDX[HEAD]):
+                n-=NUM_CLASS-1
+            elif(n>FIELD_TO_IDX[NEW_CLASSIFIERS]):
+                continue
+            
+            value = token_conll[n]
             if value != '_':
                 if field == HEAD:
                     token_dict[field] = int(value)
@@ -96,6 +118,24 @@ class CoNLL:
             if token_conll[FIELD_TO_IDX[TEXT]] == '_':
                 token_dict[TEXT] = token_conll[FIELD_TO_IDX[TEXT]]
                 token_dict[LEMMA] = token_conll[FIELD_TO_IDX[LEMMA]]
+        x = token_dict[NEW_CLASSIFIERS]
+
+        Feats = x.split("|")
+        Feats_dic = {}
+        for i in Feats:
+            try:
+                x,y = i.split("-")
+                Feats_dic[x]=y
+            except:
+                Feats_dic[x]=""
+        Feats_dic[XPOS]=token_dict[XPOS]
+        Feats_dic[UPOS]=token_dict[UPOS]
+
+        for i in range(NUM_CLASS):
+            x="|"
+            for j in Classes[i]:
+                x = x+j+"-"+Feats_dic[j]+"|"
+            token_dict[CLASS_NAMES[i]]=x
         return token_dict
 
     @staticmethod
@@ -108,6 +148,7 @@ class CoNLL:
             infile = io.StringIO(input_str)
         else:
             infile = open(input_file)
+        print(input_file)
         doc_conll = CoNLL.load_conll(infile, ignore_gapping)
         doc_dict = CoNLL.convert_conll(doc_conll)
         return doc_dict

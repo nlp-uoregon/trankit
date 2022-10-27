@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 import shutil
 from .scorers import conll18_ud_eval as ud_eval
-
+from .custom_classifiers import *
 SPACE_RE = re.compile(r'\s')
 
 
@@ -72,10 +72,17 @@ def get_ud_performance_table(score):
     out = ''
     out += "Metric     | Precision |    Recall |  F1 Score | AligndAcc" + '\n'
     out += "-----------+-----------+-----------+-----------+-----------" + '\n'
-    for metric in ["Tokens", "Sentences", "Words", "UPOS", "XPOS", "UFeats", "AllTags", "Lemmas", "UAS", "LAS",
+    if not ignore_upos_xpos:
+        H = ["UPOS","XPOS"]
+    else:
+        H = []
+    X = {}
+    X["UPOS"] = "CAT"
+    X["XPOS"] = "POSTAG"
+    for metric in ["Tokens", "Sentences", "Words"]+H+CLASS_NAMES+["AllTags", "Lemmas", "UAS", "LAS",
                    "CLAS", "MLAS", "BLEX"]:
         out += "{:11}|{:10.2f} |{:10.2f} |{:10.2f} |{}".format(
-            metric,
+            X.get(metric,metric),
             100 * score[metric].precision,
             100 * score[metric].recall,
             100 * score[metric].f1,
@@ -86,6 +93,7 @@ def get_ud_performance_table(score):
 
 
 def unzip(dir, filename):
+    print(os.path.join(dir, filename))
     with zipfile.ZipFile(os.path.join(dir, filename)) as f:
         f.extractall(dir)
     os.remove(os.path.join(dir, filename))
@@ -138,9 +146,13 @@ def tget_output_doc(conllu_doc):
                 mwt = start2mwt[word_id]
                 out_sent.append({ID: '{}-{}'.format(mwt['start'], mwt['end']), TEXT: mwt['text']})
 
-            out_sent.append({ID: f'{word_id}', TEXT: word[TEXT],
-                             UPOS: word.get(UPOS, '_'), XPOS: word.get(XPOS, '_'), FEATS: word.get(FEATS, '_'),
-                             HEAD: word.get(HEAD, f'{word_id - 1}'), DEPREL: word.get(DEPREL, '_')})
+            L = {ID: f'{word_id}', TEXT: word[TEXT],
+                             UPOS: word.get(UPOS, '_'), XPOS: word.get(XPOS, '_'), 
+                             HEAD: word.get(HEAD, f'{word_id - 1}'), DEPREL: word.get(DEPREL, '_')}
+            for i in CLASS_NAMES:
+                L[i] = word.get(i,'_')            
+            out_sent.append(L)
+
         out_doc.append(out_sent)
     return out_doc
 
@@ -173,8 +185,9 @@ def get_output_doc(tokenized_doc, conllu_doc):
                     tmp[UPOS] = word[UPOS]
                 if XPOS in word and word[XPOS] != '_':
                     tmp[XPOS] = word[XPOS]
-                if FEATS in word and word[FEATS] != '_':
-                    tmp[FEATS] = word[FEATS]
+                for i in CLASS_NAMES:
+                    if i in word and word[i] != '_':
+                        tmp[i] = word[i]
                 if HEAD in word and word[HEAD] != '_':
                     tmp[HEAD] = word[HEAD]
                 if DEPREL in word and word[DEPREL] != '_':
@@ -189,8 +202,9 @@ def get_output_doc(tokenized_doc, conllu_doc):
                     out_sent[-1][EXPANDED][expand_id][UPOS] = word[UPOS]
                 if XPOS in word and word[XPOS] != '_':
                     out_sent[-1][EXPANDED][expand_id][XPOS] = word[XPOS]
-                if FEATS in word and word[FEATS] != '_':
-                    out_sent[-1][EXPANDED][expand_id][FEATS] = word[FEATS]
+                for i in CLASS_NAMES:
+                    if i in word and word[i] != '_':
+                        out_sent[-1][EXPANDED][expand_id][i] = word[i]
                 if HEAD in word and word[HEAD] != '_':
                     out_sent[-1][EXPANDED][expand_id][HEAD] = word[HEAD]
                 if DEPREL in word and word[DEPREL] != '_':

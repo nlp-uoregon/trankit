@@ -94,13 +94,17 @@ from __future__ import print_function
 
 import argparse
 import io
+from pickle import FALSE
 import sys
 import unicodedata
 import unittest
-
+from ..custom_classifiers import *
 # CoNLL-U column names
-ID, FORM, LEMMA, UPOS, XPOS, FEATS, HEAD, DEPREL, DEPS, MISC = range(10)
-
+ID, FORM, LEMMA, UPOS, XPOS, HEAD, DEPREL, DEPS, MISC = range(9)
+HEAD += NUM_CLASS
+DEPREL += NUM_CLASS
+DEPS += NUM_CLASS
+MISC += NUM_CLASS
 # Content and functional relations
 CONTENT_DEPRELS = {
     "nsubj", "obj", "iobj", "csubj", "ccomp", "xcomp", "obl", "vocative",
@@ -170,8 +174,8 @@ def load_conllu(file):
             # List of references to UDWord instances representing functional-deprel children.
             self.functional_children = []
             # Only consider universal FEATS.
-            self.columns[FEATS] = "|".join(sorted(feat for feat in columns[FEATS].split("|")
-                                                  if feat.split("=", 1)[0] in UNIVERSAL_FEATURES))
+            #self.columns[FEATS] = "|".join(sorted(feat for feat in columns[FEATS].split("|")
+            #                                      if feat.split("-", 1)[0] in UNIVERSAL_FEATURES))
             # Let's ignore language-specific deprel subtypes.
             self.columns[DEPREL] = columns[DEPREL].split(":")[0]
             # Precompute which deprels are CONTENT_DEPRELS and which FUNCTIONAL_DEPRELS
@@ -182,6 +186,7 @@ def load_conllu(file):
 
     # Load the CoNLL-U file
     index, sentence_start = 0, None
+
     while True:
         line = file.readline()
         if not line:
@@ -199,6 +204,7 @@ def load_conllu(file):
         if not line:
             # Add parent and children UDWord links and check there are no cycles
             def process_word(word):
+                #print(word.parent,word.columns)
                 if word.parent == "remapping":
                     raise UDError("There is a cycle in a sentence")
                 if word.parent is None:
@@ -210,7 +216,6 @@ def load_conllu(file):
                         word.parent = "remapping"
                         process_word(parent)
                         word.parent = parent
-
             for word in ud.words[sentence_start:]:
                 process_word(word)
             # func_children cannot be assigned within process_word
@@ -231,9 +236,12 @@ def load_conllu(file):
 
         # Read next token/word
         columns = line.split("\t")
-        if len(columns) != 10:
+        '''
+        if len(columns) != 11:
+            print(len(columns),columns)
+            print()
             raise UDError("The CoNLL-U line does not contain 10 tab-separated columns: '{}'".format(_encode(line)))
-
+        '''
         # Skip empty nodes
         if "." in columns[ID]:
             continue
@@ -249,7 +257,30 @@ def load_conllu(file):
         ud.characters.extend(columns[FORM])
         ud.tokens.append(UDSpan(index, index + len(columns[FORM])))
         index += len(columns[FORM])
+        if(len(columns)==10):
+            x = columns[5]
+            Feats = x.split("|")
+            Feats_dic = {}
+            for i in Feats:
+                try:
+                    x,y = i.split("-")
+                    Feats_dic[x] = y
+                except:
+                    Feats_dic[i[:-1]]=""
+            Feats_dic['xpos'] = columns[XPOS]
+            Feats_dic['upos'] = columns[UPOS]
+            #print("line 270",columns)
+            L=columns[6:]
+            columns = columns[:5]
 
+            for i in range(NUM_CLASS):
+                x="|"
+                for j in Classes[i]:
+                    x = x+j+"-"+Feats_dic[j]+"|"
+                columns += [x]
+            columns+=L
+        else:
+            pass
         # Handle multi-word tokens to save word(s)
         if "-" in columns[ID]:
             try:
@@ -263,6 +294,8 @@ def load_conllu(file):
                 if len(word_columns) != 10:
                     raise UDError(
                         "The CoNLL-U line does not contain 10 tab-separated columns: '{}'".format(_encode(word_line)))
+                
+                
                 ud.words.append(UDWord(ud.tokens[-1], word_columns, is_multiword=True))
         # Basic tokens/words
         else:
@@ -280,12 +313,11 @@ def load_conllu(file):
                 raise UDError("Cannot parse HEAD '{}'".format(_encode(columns[HEAD])))
             if head_id < 0:
                 raise UDError("HEAD cannot be negative")
-
             ud.words.append(UDWord(ud.tokens[-1], columns, is_multiword=False))
+    
 
     if sentence_start is not None:
         raise UDError("The CoNLL-U file does not end with empty line")
-
     return ud
 
 
@@ -332,7 +364,19 @@ def evaluate(gold_ud, system_ud):
 
         return Score(len(gold_spans), len(system_spans), correct)
 
-    def alignment_score(alignment, key_fn=None, filter_fn=None):
+    def alignment_score(alignment, key_fn=None, filter_fn=None,name="rand"):
+        def f(x,y):
+            x2 = x.columns
+            if(not ignore_upos_xpos):
+                X = [x2[UPOS],x2[XPOS]]
+            else:
+                X = []
+            for i in range(NUM_CLASS):
+                X+=[x2[5+i]]
+            return X
+
+        if name == "all_tags":
+            key_fn = f
         if filter_fn is not None:
             gold = sum(1 for gold in alignment.gold_words if filter_fn(gold))
             system = sum(1 for system in alignment.system_words if filter_fn(system))
@@ -357,7 +401,6 @@ def evaluate(gold_ud, system_ud):
             if filter_fn is None or filter_fn(words.gold_word):
                 if key_fn(words.gold_word, gold_aligned_gold) == key_fn(words.system_word, gold_aligned_system):
                     correct += 1
-
         return Score(gold, system, correct, aligned)
 
     def beyond_end(words, i, multiword_span_end):
@@ -464,29 +507,34 @@ def evaluate(gold_ud, system_ud):
     # Align words
     alignment = align_words(gold_ud.words, system_ud.words)
 
-    # Compute the F1-scores
-    return {
+    L = {
         "Tokens": spans_score(gold_ud.tokens, system_ud.tokens),
         "Sentences": spans_score(gold_ud.sentences, system_ud.sentences),
         "Words": alignment_score(alignment),
-        "UPOS": alignment_score(alignment, lambda w, _: w.columns[UPOS]),
-        "XPOS": alignment_score(alignment, lambda w, _: w.columns[XPOS]),
-        "UFeats": alignment_score(alignment, lambda w, _: w.columns[FEATS]),
-        "AllTags": alignment_score(alignment, lambda w, _: (w.columns[UPOS], w.columns[XPOS], w.columns[FEATS])),
+        "AllTags": alignment_score(alignment, lambda w, _: (w.columns),name="all_tags"),
         "Lemmas": alignment_score(alignment, lambda w, ga: w.columns[LEMMA] if ga(w).columns[LEMMA] != "_" else "_"),
         "UAS": alignment_score(alignment, lambda w, ga: ga(w.parent)),
         "LAS": alignment_score(alignment, lambda w, ga: (ga(w.parent), w.columns[DEPREL])),
         "CLAS": alignment_score(alignment, lambda w, ga: (ga(w.parent), w.columns[DEPREL]),
                                 filter_fn=lambda w: w.is_content_deprel),
         "MLAS": alignment_score(alignment,
-                                lambda w, ga: (ga(w.parent), w.columns[DEPREL], w.columns[UPOS], w.columns[FEATS],
-                                               [(ga(c), c.columns[DEPREL], c.columns[UPOS], c.columns[FEATS])
+                                lambda w, ga: (ga(w.parent), w.columns[DEPREL], w.columns[UPOS],
+                                               [(ga(c), c.columns[DEPREL], c.columns[UPOS])
                                                 for c in w.functional_children]),
                                 filter_fn=lambda w: w.is_content_deprel),
         "BLEX": alignment_score(alignment, lambda w, ga: (ga(w.parent), w.columns[DEPREL],
                                                           w.columns[LEMMA] if ga(w).columns[LEMMA] != "_" else "_"),
                                 filter_fn=lambda w: w.is_content_deprel),
     }
+    if(not ignore_upos_xpos):
+        L["UPOS"] = alignment_score(alignment, lambda w, _: w.columns[UPOS])
+        L["XPOS"] = alignment_score(alignment, lambda w, _: w.columns[XPOS])
+    for i in range(NUM_CLASS):
+        L[CLASS_NAMES[i]] =  alignment_score(alignment, lambda w, _: w.columns[5+i])
+
+    
+
+    return L
 
 
 def load_conllu_file(path):
@@ -516,7 +564,6 @@ def main():
 
     # Evaluate
     evaluation = evaluate_wrapper(args)
-
     # Print the evaluation
     if not args.verbose and not args.counts:
         print("LAS F1 Score: {:.2f}".format(100 * evaluation["LAS"].f1))
@@ -528,7 +575,16 @@ def main():
         else:
             print("Metric     | Precision |    Recall |  F1 Score | AligndAcc")
         print("-----------+-----------+-----------+-----------+-----------")
-        for metric in ["Tokens", "Sentences", "Words", "UPOS", "XPOS", "UFeats", "AllTags", "Lemmas", "UAS", "LAS",
+        for metric in ["Tokens", "Sentences", "Words", "UPOS", "XPOS", 
+        "-".join(Cat1)+"-",
+        "-".join(Cat2)+"-",
+        "-".join(Cat3)+"-",
+        "-".join(Cat4)+"-",
+        "-".join(Cat5)+"-",
+        "-".join(Cat6)+"-",
+        "-".join(Cat7)+"-",
+        "-".join(Cat8)+"-",
+        "-".join(Cat9)+"-", "AllTags", "Lemmas", "UAS", "LAS",
                        "CLAS", "MLAS", "BLEX"]:
             if args.counts:
                 print("{:11}|{:10} |{:10} |{:10} |{:10}".format(

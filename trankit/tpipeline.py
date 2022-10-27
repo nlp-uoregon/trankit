@@ -1,4 +1,6 @@
+from symbol import break_stmt
 from .config import config as master_config
+from .utils.custom_classifiers import *
 from .models.base_models import Multilingual_Embedding
 from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
 from .models.mwt_model import MWTWrapper
@@ -17,7 +19,7 @@ from tqdm import tqdm
 from .adapter_transformers import AdamW, get_linear_schedule_with_warmup
 import logging
 
-
+task = ""
 class TPipeline:
     def __init__(self, training_config):
         super(TPipeline, self).__init__()
@@ -243,16 +245,8 @@ class TPipeline:
 
     def _prepare_posdep(self):
         in_conllu = {
-            'dev': os.path.join(self._config._save_dir, 'preds', 'mwt.dev.conllu')
-        }
-        if not os.path.exists(in_conllu['dev']):
-            in_conllu = {
-                'dev': os.path.join(self._config._save_dir, 'preds', 'tokenizer.dev.conllu')
-            }
-            if not os.path.exists(in_conllu['dev']):
-                in_conllu = {
                     'dev': self._dev_conllu_fpath
-                }
+        }
 
         self.train_set = TaggerDataset(
             self._config,
@@ -270,7 +264,8 @@ class TPipeline:
         self._config.itos = {}
         self._config.itos[UPOS] = {v: k for k, v in self.train_set.vocabs[UPOS].items()}
         self._config.itos[XPOS] = {v: k for k, v in self.train_set.vocabs[XPOS].items()}
-        self._config.itos[FEATS] = {v: k for k, v in self.train_set.vocabs[FEATS].items()}
+        for i in CLASS_NAMES:
+            self._config.itos[i] = {v:k for k,v in self.train_set.vocabs[i].items()}
         self._config.itos[DEPREL] = {v: k for k, v in self.train_set.vocabs[DEPREL].items()}
 
         self.dev_set = TaggerDataset(
@@ -311,14 +306,24 @@ class TPipeline:
 
     def _prepare_data_and_vocabs(self):
         if self._task == 'tokenize':
+            task = 'tokenize'
+            Classes,CLASS_NAMES,NUM_CLASS,ignore_upos_xpos = func(task)
             self._prepare_tokenize()
         elif self._task == 'mwt':
+            task = 'mwt'
+            Classes,CLASS_NAMES,NUM_CLASS,ignore_upos_xpos = func(task)
             self._prepare_mwt()
         elif self._task == 'posdep':
+            task = 'posdep'
+            Classes,CLASS_NAMES,NUM_CLASS,ignore_upos_xpos = func(task)
             self._prepare_posdep()
         elif self._task == 'lemmatize':
+            task = 'lemmatize'
+            Classes,CLASS_NAMES,NUM_CLASS,ignore_upos_xpos = func(task)
             self._prepare_lemma()
         elif self._task == 'ner':
+            task = 'ner'
+            Classes,CLASS_NAMES,NUM_CLASS,ignore_upos_xpos = func(task)
             self._prepare_ner()
 
     def _train_tokenize(self):
@@ -477,12 +482,14 @@ class TPipeline:
             self._embedding_layers.train()
             self._tagger.train()
             self.optimizer.zero_grad()
+            loss_list = []
             for batch_idx, batch in enumerate(DataLoader(
                     self.train_set, batch_size=self._config.batch_size,
                     shuffle=True, collate_fn=self.train_set.collate_fn)):
                 progress.update(1)
                 word_reprs, cls_reprs = self._embedding_layers.get_tagger_inputs(batch)
                 loss = self._tagger(batch, word_reprs, cls_reprs)
+                loss_list += [loss]
                 loss.backward()
 
                 torch.nn.utils.clip_grad_norm_([p for n, p in self.model_parameters], self._config.grad_clipping)
@@ -493,6 +500,7 @@ class TPipeline:
                     'posdep tagger: step: {}/{}, loss: {}'.format(batch_idx + 1, self.batch_num, loss.item()),
                     printout=False
                 )
+            print("training loss = ",sum(loss_list)/len(loss_list))
             progress.close()
             dev_score, pred_conllu_fpath = self._eval_posdep(data_set=self.dev_set, batch_num=self.dev_batch_num,
                                                              name='dev', epoch=epoch)
@@ -512,12 +520,14 @@ class TPipeline:
             self._printlog(get_ud_performance_table(dev_score))
 
     def _eval_posdep(self, data_set, batch_num, name, epoch):
+        if(name=="test"):
+            self._load_model(ckpt_fpath=os.path.join(self._config._save_dir,
+                                                         '{}.tagger.mdl'.format(self._lang)))
         self._embedding_layers.eval()
         self._tagger.eval()
         # evaluate
         progress = tqdm(total=batch_num, ncols=75,
                         desc='{} {}'.format(name, epoch))
-
         for batch in DataLoader(data_set, batch_size=self._config.batch_size,
                                 shuffle=False, collate_fn=data_set.collate_fn):
             batch_size = len(batch.word_num)
@@ -527,14 +537,15 @@ class TPipeline:
             predictions = self._tagger.predict(batch, word_reprs, cls_reprs)
             predicted_upos = predictions[0]
             predicted_xpos = predictions[1]
-            predicted_feats = predictions[2]
+            predicted_feat = predictions[2:2+NUM_CLASS]
 
             predicted_upos = predicted_upos.data.cpu().numpy().tolist()
             predicted_xpos = predicted_xpos.data.cpu().numpy().tolist()
-            predicted_feats = predicted_feats.data.cpu().numpy().tolist()
+            for j in range(NUM_CLASS):
+                predicted_feat[j] = predicted_feat[j].data.cpu().numpy().tolist()
 
             # head, deprel
-            predicted_dep = predictions[3]
+            predicted_dep = predictions[2+NUM_CLASS]
             sentlens = [l + 1 for l in batch.word_num]
             head_seqs = [chuliu_edmonds_one_root(adj[:l, :l])[1:] for adj, l in
                          zip(predicted_dep[0], sentlens)]
@@ -560,16 +571,19 @@ class TPipeline:
                     pred_xpos_id = predicted_xpos[bid][i]
                     xpos_name = self._config.itos[XPOS][pred_xpos_id]
                     data_set.conllu_doc[sentid][wordid][XPOS] = xpos_name
-                    # feats
-                    pred_feats_id = predicted_feats[bid][i]
-                    feats_name = self._config.itos[FEATS][pred_feats_id]
-                    data_set.conllu_doc[sentid][wordid][FEATS] = feats_name
+                    # class1
+                    for j in range(NUM_CLASS):
+                        p_id = predicted_feat[j][bid][i]
+                        c_name = self._config.itos[CLASS_NAMES[j]][p_id]
+                        data_set.conllu_doc[sentid][wordid][CLASS_NAMES[j]] = c_name
+                   
 
                     # head
                     data_set.conllu_doc[sentid][wordid][HEAD] = int(pred_tokens[bid][i][0])
                     # deprel
                     data_set.conllu_doc[sentid][wordid][DEPREL] = pred_tokens[bid][i][1]
-
+        
+            
         progress.close()
         pred_conllu_fpath = os.path.join(self._config._save_dir, 'preds',
                                          'tagger.{}.conllu'.format(name) + '.epoch-{}'.format(epoch))
@@ -644,6 +658,17 @@ class TPipeline:
         progress.close()
         score = score_by_entity(predictions, golds, self.logger)
         return score
+    def _load_model(self, ckpt_fpath):
+        state = torch.load(ckpt_fpath)
+        trainable_weight_names = [n for n, p in self.model_parameters if p.requires_grad]
+        for k, v in self._embedding_layers.state_dict().items():
+            if k in trainable_weight_names:
+                self._embedding_layers.state_dict()[k] =state['adapters'][k]
+        if self._task == 'posdep':
+            for k, v in self._tagger.state_dict().items():
+                if k in trainable_weight_names:
+                    self._tagger.state_dict()[k]=state['adapters'][k]
+
 
     def _save_model(self, ckpt_fpath, epoch):
         trainable_weight_names = [n for n, p in self.model_parameters if p.requires_grad]
