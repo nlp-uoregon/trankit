@@ -12,7 +12,7 @@ from .adapter_utils import AdapterType, get_adapter_config_hash, resolve_adapter
 logger = logging.getLogger(__name__)
 
 
-@dataclass()
+@dataclass
 class InvertibleAdapterConfig(Mapping):
     block_type: str
     non_linearity: str
@@ -37,6 +37,9 @@ class InvertibleAdapterConfig(Mapping):
 
     def __len__(self):
         return len(self.__dict__)
+    
+    def __hash__(self):
+        return hash(self.__dict__)
 
 
 @dataclass
@@ -75,6 +78,10 @@ class AdapterConfig(Mapping):
 
     def __len__(self):
         return len(self.__dict__)
+    
+    # not necessary but added for future-proofing
+    def __hash__(self):
+        return hash(self.__dict__)
 
     def to_dict(self):
         return asdict(self)
