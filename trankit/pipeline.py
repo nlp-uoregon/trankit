@@ -164,6 +164,7 @@ class Pipeline:
                                                                                    master_config._cache_dir,
                                                                                    master_config.embedding_name))
         self._config = master_config
+        self._config.active_adapter = 'None'
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
 
@@ -189,6 +190,7 @@ class Pipeline:
             lang = self.added_langs[0]
             self._config.active_lang = lang
             self.active_lang = lang
+            self._config.active_adapter = 'None'
             self._config.treebank_name = lang2treebank[lang]
             self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                         400)  # this is for tokenizer only
@@ -206,6 +208,7 @@ class Pipeline:
             self.added_langs)
         self._config.active_lang = lang
         self.active_lang = lang
+        self._config.active_adapter = 'None'
         self._config.treebank_name = lang2treebank[lang]
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
@@ -288,19 +291,22 @@ class Pipeline:
 
     def _load_adapter_weights(self, model_name):
         assert model_name in ['tokenizer', 'tagger', 'ner']
-        if model_name == 'tokenizer':
-            pretrained_weights = self._tokenizer[self._config.active_lang].pretrained_tokenizer_weights
-        elif model_name == 'tagger':
-            pretrained_weights = self._tagger[self._config.active_lang].pretrained_tagger_weights
-        else:
-            assert model_name == 'ner'
-            pretrained_weights = self._ner_model[self._config.active_lang].pretrained_ner_weights
+        if model_name != self._config.active_adapter: # only load adapter when we need to perform a new task
+            if model_name == 'tokenizer':
+                pretrained_weights = self._tokenizer[self._config.active_lang].pretrained_tokenizer_weights
+            elif model_name == 'tagger':
+                pretrained_weights = self._tagger[self._config.active_lang].pretrained_tagger_weights
+            else:
+                assert model_name == 'ner'
+                pretrained_weights = self._ner_model[self._config.active_lang].pretrained_ner_weights
 
-        for name, value in pretrained_weights.items():
-            if 'adapters.{}.adapter'.format(model_name) in name:
-                target_name = name.replace('adapters.{}.adapter'.format(model_name), 'adapters.embedding.adapter')
-                self._embedding_weights[target_name] = value
-        self._embedding_layers.load_state_dict(self._embedding_weights)
+            for name, value in pretrained_weights.items():
+                if 'adapters.{}.adapter'.format(model_name) in name:
+                    target_name = name.replace('adapters.{}.adapter'.format(model_name), 'adapters.embedding.adapter')
+                    self._embedding_weights[target_name] = value
+            self._embedding_layers.load_state_dict(self._embedding_weights)
+            # save information of active adapter
+            self._config.active_adapter = model_name
 
     def _detect_lang_and_switch(self, text):
         detected_code = langid.classify(text)[0]
@@ -313,6 +319,7 @@ class Pipeline:
             self.added_langs)
         self._config.active_lang = lang
         self.active_lang = lang
+        self._config.active_adapter = 'None'
         self._config.treebank_name = lang2treebank[lang]
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
