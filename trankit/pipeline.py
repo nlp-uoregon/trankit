@@ -1,4 +1,4 @@
-from .config import config as master_config
+from .config import Config as MasterConfig
 from .models.base_models import Multilingual_Embedding
 from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
 from .models.mwt_model import MWTWrapper
@@ -53,7 +53,10 @@ class Pipeline:
         # set the embedding type
         assert embedding in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
             embedding, supported_embeddings)
-        master_config.embedding_name = embedding
+        print('using separate master configs for each pipeline instance')
+        print('-' * 20)
+        self.master_config = MasterConfig()
+        self.master_config.embedding_name = embedding
 
         self._cache_dir = cache_dir
         self._gpu = gpu
@@ -71,7 +74,7 @@ class Pipeline:
             cache_dir=self._config._cache_dir,
             language=lang,
             saved_model_version=saved_model_version,  # manually set this to avoid duplicated storage
-            embedding_name=master_config.embedding_name
+            embedding_name=self.master_config.embedding_name
         )
 
         # load ALL vocabs
@@ -142,28 +145,28 @@ class Pipeline:
         # decide whether to run on GPU or CPU
         if self._gpu and torch.cuda.is_available():
             self._use_gpu = True
-            master_config.device = torch.device('cuda')
+            self.master_config.device = torch.device('cuda')
             self._tokbatchsize = 6
             self._tagbatchsize = 24
         else:
             self._use_gpu = False
-            master_config.device = torch.device('cpu')
+            self.master_config.device = torch.device('cpu')
             self._tokbatchsize = 2
             self._tagbatchsize = 12
 
         if self._cache_dir is None:
-            master_config._cache_dir = 'cache/trankit'
+            self.master_config._cache_dir = 'cache/trankit'
         else:
-            master_config._cache_dir = self._cache_dir
+            self.master_config._cache_dir = self._cache_dir
 
-        if not os.path.exists(master_config._cache_dir):
-            os.makedirs(master_config._cache_dir, exist_ok=True)
+        if not os.path.exists(self.master_config._cache_dir):
+            os.makedirs(self.master_config._cache_dir, exist_ok=True)
 
-        master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
+        self.master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(self.master_config.embedding_name,
                                                                                cache_dir=os.path.join(
-                                                                                   master_config._cache_dir,
-                                                                                   master_config.embedding_name))
-        self._config = master_config
+                                                                                   self.master_config._cache_dir,
+                                                                                   self.master_config.embedding_name))
+        self._config = self.master_config
         self._config.active_adapter = 'None'
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
@@ -225,17 +228,17 @@ class Pipeline:
             cache_dir=self._config._cache_dir,
             language=lang,
             saved_model_version='v1.0.0',  # manually set this to avoid duplicated storage
-            embedding_name=master_config.embedding_name
+            embedding_name=self.master_config.embedding_name
         )
         # update vocabs
         treebank_name = lang2treebank[lang]
-        with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
+        with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
                                '{}/{}.vocabs.json'.format(treebank2lang[treebank_name],
                                                           treebank2lang[treebank_name]))) as f:
             vocabs = json.load(f)
             self._config.vocabs[treebank_name] = vocabs
         if lang in langwithner:
-            with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
+            with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
                                    '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                 self._config.ner_vocabs[lang] = json.load(f)
         self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
@@ -275,7 +278,7 @@ class Pipeline:
         self._config.itos = defaultdict(dict)
         for lang in self.added_langs:
             treebank_name = lang2treebank[lang]
-            with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
+            with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
                                    '{}/{}.vocabs.json'.format(lang, lang))) as f:
                 vocabs = json.load(f)
                 self._config.vocabs[treebank_name] = vocabs
@@ -285,7 +288,7 @@ class Pipeline:
             self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
             # ner vocabs
             if lang in langwithner:
-                with open(os.path.join(self._config._cache_dir, master_config.embedding_name,
+                with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
                                        '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
                     self._config.ner_vocabs[lang] = json.load(f)
 

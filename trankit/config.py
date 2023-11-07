@@ -20,6 +20,3 @@ class Config:
         self.working_dir = os.path.dirname(os.path.realpath(__file__))
         self.lowercase = False
 
-
-# configuration
-config = Config()
