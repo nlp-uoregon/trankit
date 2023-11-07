@@ -53,8 +53,6 @@ class Pipeline:
         # set the embedding type
         assert embedding in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
             embedding, supported_embeddings)
-        print('using separate master configs for each pipeline instance')
-        print('-' * 20)
         self.master_config = MasterConfig()
         self.master_config.embedding_name = embedding
 
