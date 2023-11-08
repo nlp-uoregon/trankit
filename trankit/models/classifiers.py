@@ -127,7 +127,7 @@ class PosDepClassifier(nn.Module):
         dep_reprs = self.down_project(dep_reprs)
         unlabeled_scores = self.unlabeled(dep_reprs, dep_reprs).squeeze(3)
 
-        diag = torch.eye(batch.head_idxs.size(-1) + 1, dtype=torch.bool).cuda().unsqueeze(0)
+        diag = torch.eye(batch.head_idxs.size(-1) + 1, dtype=torch.bool).to(self.config.device).unsqueeze(0)
         unlabeled_scores.masked_fill_(diag, -float('inf'))
 
         unlabeled_scores = unlabeled_scores[:, 1:, :]  
