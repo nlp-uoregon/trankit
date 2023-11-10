@@ -14,6 +14,7 @@ from .utils.chuliu_edmonds import *
 from .adapter_transformers import XLMRobertaTokenizer
 from datetime import datetime
 import langid
+import gc
 
 
 def is_string(input):
@@ -51,8 +52,8 @@ class Pipeline:
             self.auto_mode = False
 
         # set the embedding type
-        assert embedding in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
-            embedding, supported_embeddings)
+        assert embedding in supported_embeddings, f'{embedding} has not been supported.\nSupported embeddings: {supported_embeddings}'
+
         self.master_config = MasterConfig()
         self.master_config.embedding_name = embedding
 
@@ -63,10 +64,8 @@ class Pipeline:
         self._setup_config(lang)
         self._config.training = False
         self.added_langs = [lang]
-        for lang in self.added_langs:
-            assert lang in lang2treebank, '{} has not been supported. Currently supported languages: {}'.format(lang,
-                                                                                                                list(
-                                                                                                                    lang2treebank.keys()))
+        assert lang in lang2treebank, f'{lang} has not been supported. Currently supported languages: {list(lang2treebank.keys())}'
+
         # download saved model for initial language
         download(
             cache_dir=self._config._cache_dir,
@@ -85,42 +84,41 @@ class Pipeline:
         if self._use_gpu:
             self._embedding_layers.half()
         self._embedding_layers.eval()
+
         # tokenizers
         self._tokenizer = {}
-        for lang in self.added_langs:
-            self._tokenizer[lang] = TokenizerClassifier(self._config, treebank_name=lang2treebank[lang])
-            self._tokenizer[lang].to(self._config.device)
-            if self._use_gpu:
-                self._tokenizer[lang].half()
-            self._tokenizer[lang].eval()
+        self._tokenizer[lang] = TokenizerClassifier(self._config, treebank_name=lang2treebank[lang])
+        self._tokenizer[lang].to(self._config.device)
+        if self._use_gpu:
+            self._tokenizer[lang].half()
+        self._tokenizer[lang].eval()
+
         # taggers
         self._tagger = {}
-        for lang in self.added_langs:
-            self._tagger[lang] = PosDepClassifier(self._config, treebank_name=lang2treebank[lang])
-            self._tagger[lang].to(self._config.device)
-            if self._use_gpu:
-                self._tagger[lang].half()
-            self._tagger[lang].eval()
+        self._tagger[lang] = PosDepClassifier(self._config, treebank_name=lang2treebank[lang])
+        self._tagger[lang].to(self._config.device)
+        if self._use_gpu:
+            self._tagger[lang].half()
+        self._tagger[lang].eval()
 
-        #     - mwt and lemma:
+        # mwt and lemma:
         self._mwt_model = {}
-        for lang in self.added_langs:
-            treebank_name = lang2treebank[lang]
-            if tbname2training_id[treebank_name] % 2 == 1:
-                self._mwt_model[lang] = MWTWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
+        treebank_name = lang2treebank[lang]
+        if tbname2training_id[treebank_name] % 2 == 1:
+            self._mwt_model[lang] = MWTWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
+
         self._lemma_model = {}
-        for lang in self.added_langs:
-            treebank_name = lang2treebank[lang]
-            self._lemma_model[lang] = LemmaWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
-        # ner if possible
+        treebank_name = lang2treebank[lang]
+        self._lemma_model[lang] = LemmaWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
+
+        # ner if available
         self._ner_model = {}
-        for lang in self.added_langs:
-            if lang in langwithner:
-                self._ner_model[lang] = NERClassifier(self._config, lang)
-                self._ner_model[lang].to(self._config.device)
-                if self._use_gpu:
-                    self._ner_model[lang].half()
-                self._ner_model[lang].eval()
+        if lang in langwithner:
+            self._ner_model[lang] = NERClassifier(self._config, lang)
+            self._ner_model[lang].to(self._config.device)
+            if self._use_gpu:
+                self._ner_model[lang].half()
+            self._ner_model[lang].eval()
 
         # load and hold the pretrained weights
         self._embedding_weights = self._embedding_layers.state_dict()
@@ -133,7 +131,7 @@ class Pipeline:
             langid.set_languages([lang2code[l] for l in self.added_langs])
             self.code2lang = code2lang
             print('=' * 50)
-            print('Trankit is in auto mode!\nAvailable languages: {}'.format(self.added_langs))
+            print(f'Trankit is in auto mode!\nAvailable languages: {self.added_langs}')
             print('=' * 50)
         else:
             self.set_active(lang)
@@ -172,7 +170,7 @@ class Pipeline:
     def set_auto(self, state):
         assert type(state) == bool
         if state is True:
-            print('Turning on auto mode for {} ...'.format(self.added_langs))
+            print(f'Turning on auto mode for {self.added_langs} ...')
             self.auto_mode = True
 
             cls_codes = []
@@ -198,15 +196,14 @@ class Pipeline:
             print('=' * 50)
             print('Trankit is in normal mode!')
             print('=' * 50)
-            print('Active language: {}'.format(self._config.active_lang))
-            print('Available languages: {}'.format(self.added_langs))
+            print(f'Active language: {self._config.active_lang}')
+            print(f'Available languages: {self.added_langs}')
             print('=' * 50)
 
     def set_active(self, lang):
         assert not self.auto_mode, 'Cannot set a particular language as active in auto mode.\nPlease consider using Trankit in the normal mode to use this function.'
-        assert is_string(
-            lang) and lang in self.added_langs, 'Specified language must be added before being activated.\nCurrent added languages: {}'.format(
-            self.added_langs)
+        assert is_string(lang) and lang in self.added_langs, f'Specified language must be added before being activated.\nCurrent added languages: {self.added_langs}'
+
         self._config.active_lang = lang
         self.active_lang = lang
         self._config.active_adapter = 'None'
@@ -214,60 +211,65 @@ class Pipeline:
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
         print('=' * 50)
-        print('Active language: {}'.format(self._config.active_lang))
+        print(f'Active language: {self._config.active_lang}')
         print('=' * 50)
 
     def add(self, lang):
-        assert is_string(
-            lang) and lang in supported_langs, 'Specified language must be one of the supported languages: {}'.format(
-            supported_langs)
+        assert is_string(lang) and lang in supported_langs, f'Specified language must be one of the supported languages: {supported_langs}'
+
         # download saved models
         download(
             cache_dir=self._config._cache_dir,
             language=lang,
-            saved_model_version='v1.0.0',  # manually set this to avoid duplicated storage
+            saved_model_version=saved_model_version,  # manually set this to avoid duplicated storage
             embedding_name=self.master_config.embedding_name
         )
         # update vocabs
         treebank_name = lang2treebank[lang]
         with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
-                               '{}/{}.vocabs.json'.format(treebank2lang[treebank_name],
-                                                          treebank2lang[treebank_name]))) as f:
+                               f'{treebank2lang[treebank_name]}/{treebank2lang[treebank_name]}.vocabs.json')) as f:
             vocabs = json.load(f)
             self._config.vocabs[treebank_name] = vocabs
         if lang in langwithner:
             with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
-                                   '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
+                                   f'{lang}/{lang}.ner-vocab.json')) as f:
                 self._config.ner_vocabs[lang] = json.load(f)
+
         self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
         self._config.itos[lang][XPOS] = {v: k for k, v in vocabs[XPOS].items()}
         self._config.itos[lang][FEATS] = {v: k for k, v in vocabs[FEATS].items()}
         self._config.itos[lang][DEPREL] = {v: k for k, v in vocabs[DEPREL].items()}
+
         # add tokenizer
         self._tokenizer[lang] = TokenizerClassifier(self._config, treebank_name=lang2treebank[lang])
         self._tokenizer[lang].to(self._config.device)
         if self._use_gpu:
             self._tokenizer[lang].half()
         self._tokenizer[lang].eval()
+
         # add tagger
         self._tagger[lang] = PosDepClassifier(self._config, treebank_name=lang2treebank[lang])
         self._tagger[lang].to(self._config.device)
         if self._use_gpu:
             self._tagger[lang].half()
         self._tagger[lang].eval()
-        # mwt if needed
+
+        # mwt if available
         treebank_name = lang2treebank[lang]
         if tbname2training_id[treebank_name] % 2 == 1:
             self._mwt_model[lang] = MWTWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
+
         # lemma
         self._lemma_model[lang] = LemmaWrapper(self._config, treebank_name=treebank_name, use_gpu=self._use_gpu)
-        # ner if possible
+
+        # ner if available
         if lang in langwithner:
             self._ner_model[lang] = NERClassifier(self._config, lang)
             self._ner_model[lang].to(self._config.device)
             if self._use_gpu:
                 self._ner_model[lang].half()
             self._ner_model[lang].eval()
+
         self.added_langs.append(lang)
 
     def _load_vocabs(self):
@@ -277,7 +279,7 @@ class Pipeline:
         for lang in self.added_langs:
             treebank_name = lang2treebank[lang]
             with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
-                                   '{}/{}.vocabs.json'.format(lang, lang))) as f:
+                                   f'{lang}/{lang}.vocabs.json')) as f:
                 vocabs = json.load(f)
                 self._config.vocabs[treebank_name] = vocabs
             self._config.itos[lang][UPOS] = {v: k for k, v in vocabs[UPOS].items()}
@@ -287,12 +289,12 @@ class Pipeline:
             # ner vocabs
             if lang in langwithner:
                 with open(os.path.join(self._config._cache_dir, self.master_config.embedding_name,
-                                       '{}/{}.ner-vocab.json'.format(lang, lang))) as f:
+                                       f'{lang}/{lang}.ner-vocab.json')) as f:
                     self._config.ner_vocabs[lang] = json.load(f)
 
     def _load_adapter_weights(self, model_name):
         assert model_name in ['tokenizer', 'tagger', 'ner']
-        if model_name != self._config.active_adapter: # only load adapter when we need to perform a new task
+        if model_name != self._config.active_adapter: # only load adapter weights when we need to perform a new task
             if model_name == 'tokenizer':
                 pretrained_weights = self._tokenizer[self._config.active_lang].pretrained_tokenizer_weights
             elif model_name == 'tagger':
@@ -302,8 +304,9 @@ class Pipeline:
                 pretrained_weights = self._ner_model[self._config.active_lang].pretrained_ner_weights
 
             for name, value in pretrained_weights.items():
-                if 'adapters.{}.adapter'.format(model_name) in name:
-                    target_name = name.replace('adapters.{}.adapter'.format(model_name), 'adapters.embedding.adapter')
+                adapter_name = f'adapters.{model_name}.adapter'
+                if adapter_name in name:
+                    target_name = name.replace(adapter_name, 'adapters.embedding.adapter')
                     self._embedding_weights[target_name] = value
             self._embedding_layers.load_state_dict(self._embedding_weights)
             # save information of active adapter
@@ -311,22 +314,18 @@ class Pipeline:
 
     def _detect_lang_and_switch(self, text):
         detected_code = langid.classify(text)[0]
-        assert detected_code in self.code2lang, 'Detected code "{}" must be in {}'.format(detected_code,
-                                                                                          self.code2lang.keys())
+        assert detected_code in self.code2lang, f'Detected code "{detected_code}" must be in {self.code2lang.keys()}'
+
         lang = self.code2lang[detected_code]
 
-        assert is_string(
-            lang) and lang in self.added_langs, 'Specified language must be added before being activated.\nCurrent added languages: {}'.format(
-            self.added_langs)
+        assert is_string(lang) and lang in self.added_langs, f'Specified language must be added before being activated.\nCurrent added languages: {self.added_langs}'
+
         self._config.active_lang = lang
         self.active_lang = lang
         self._config.active_adapter = 'None'
         self._config.treebank_name = lang2treebank[lang]
         self._config.max_input_length = tbname2max_input_length.get(lang2treebank[lang],
                                                                     400)  # this is for tokenizer only
-        # print('=' * 50)
-        # print('Switching to {}'.format(lang))
-        # print('=' * 50)
 
     def ssplit(self, in_doc):  # assuming input is a document
         assert is_string(in_doc), 'Input must be a non-empty string.'
@@ -366,6 +365,11 @@ class Pipeline:
                                               paragraph_indexes):
             para_id_to_wp_pred_labels[p_index].extend([(pred, char_position) for pred, char_position in
                                                        zip(wp_pred_ls, wp_es)])
+
+        del wordpiece_pred_labels
+        del wordpiece_ends
+        del paragraph_indexes
+
         # get predictions
         corpus_text = in_doc
 
@@ -391,6 +395,7 @@ class Pipeline:
             all_wp_preds.append(para_wp_preds)
             all_para_texts.append(para_text)
 
+        del cloned_raw_text
         ###########################
         sentences = []
         for j in range(len(paragraphs)):
@@ -436,6 +441,7 @@ class Pipeline:
                      DSPAN: (sent_span[0], sent_span[1])})
 
         torch.cuda.empty_cache()
+        gc.collect()
         return {TEXT: in_doc, SENTENCES: sentences, LANG: self.active_lang}
 
     def tokenize(self, input, is_sent=False):
