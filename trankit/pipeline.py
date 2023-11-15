@@ -366,10 +366,6 @@ class Pipeline:
             para_id_to_wp_pred_labels[p_index].extend([(pred, char_position) for pred, char_position in
                                                        zip(wp_pred_ls, wp_es)])
 
-        del wordpiece_pred_labels
-        del wordpiece_ends
-        del paragraph_indexes
-
         # get predictions
         corpus_text = in_doc
 
@@ -395,7 +391,6 @@ class Pipeline:
             all_wp_preds.append(para_wp_preds)
             all_para_texts.append(para_text)
 
-        del cloned_raw_text
         ###########################
         sentences = []
         for j in range(len(paragraphs)):
@@ -440,8 +435,20 @@ class Pipeline:
                     {ID: len(sentences) + 1, TEXT: in_doc[sent_span[0]: sent_span[1]],
                      DSPAN: (sent_span[0], sent_span[1])})
 
-        torch.cuda.empty_cache()
+        del wordpiece_pred_labels
+        del wordpiece_ends
+        del paragraph_indexes
+
+        del para_id_to_wp_pred_labels
+        del cloned_raw_text
+
+        del all_wp_preds 
+        del all_para_texts 
+        del all_para_starts 
+
         gc.collect()
+
+        torch.cuda.empty_cache()
         return {TEXT: in_doc, SENTENCES: sentences, LANG: self.active_lang}
 
     def tokenize(self, input, is_sent=False):
@@ -493,6 +500,7 @@ class Pipeline:
                                               paragraph_indexes):
             para_id_to_wp_pred_labels[p_index].extend([(pred, char_position) for pred, char_position in
                                                        zip(wp_pred_ls, wp_es)])
+
         # get predictions
         corpus_text = in_sent
 
@@ -558,9 +566,22 @@ class Pipeline:
             if len(current_sent):
                 tokens += get_output_sentence(current_sent)
 
+        del wordpiece_pred_labels
+        del wordpiece_ends
+        del paragraph_indexes 
+
+        del para_id_to_wp_pred_labels 
+        del cloned_raw_text
+
+        del all_wp_preds 
+        del all_para_texts 
+        del all_para_starts 
+
+        gc.collect()
         # multi-word expansion if required
         if tbname2training_id[self._config.treebank_name] % 2 == 1:
             tokens = self._mwt_expand([{TOKENS: tokens}])[0][TOKENS]
+
         torch.cuda.empty_cache()
         return tokens
 
@@ -598,6 +619,7 @@ class Pipeline:
                                               paragraph_indexes):
             para_id_to_wp_pred_labels[p_index].extend([(pred, char_position) for pred, char_position in
                                                        zip(wp_pred_ls, wp_es)])
+
         # get predictions
         corpus_text = in_doc
 
@@ -674,6 +696,18 @@ class Pipeline:
                     DSPAN: (processed_sent[0][DSPAN][0], processed_sent[-1][DSPAN][1])
                 })
 
+        del wordpiece_pred_labels
+        del wordpiece_ends
+        del paragraph_indexes 
+
+        del para_id_to_wp_pred_labels 
+        del cloned_raw_text
+
+        del all_wp_preds 
+        del all_para_texts 
+        del all_para_starts 
+
+        gc.collect()
         # multi-word expansion if required
         if tbname2training_id[self._config.treebank_name] % 2 == 1:
             doc = self._mwt_expand(doc)
@@ -793,6 +827,15 @@ class Pipeline:
                     test_set.conllu_doc[sentid][wordid][HEAD] = int(pred_tokens[bid][i][0])
                     # deprel
                     test_set.conllu_doc[sentid][wordid][DEPREL] = pred_tokens[bid][i][1]
+
+            del predictions
+            del sentlens 
+            del head_seqs 
+            del deprel_seqs 
+            del pred_tokens 
+
+        gc.collect()
+
         tagged_doc = get_output_doc(posdep_sent, test_set.conllu_doc)
         torch.cuda.empty_cache()
         return tagged_doc[0][TOKENS]
@@ -870,6 +913,14 @@ class Pipeline:
                     test_set.conllu_doc[sentid][wordid][HEAD] = int(pred_tokens[bid][i][0])
                     # deprel
                     test_set.conllu_doc[sentid][wordid][DEPREL] = pred_tokens[bid][i][1]
+
+            del predictions
+            del sentlens 
+            del head_seqs 
+            del deprel_seqs 
+            del pred_tokens 
+
+        gc.collect()
         tagged_doc = get_output_doc(dposdep_doc, test_set.conllu_doc)
         torch.cuda.empty_cache()
         return tagged_doc
@@ -918,10 +969,12 @@ class Pipeline:
         if type(in_sent) == str:
             in_sent = self._tokenize_sent(in_sent)
             in_sent = self._posdep_sent(in_sent)
-        dlemmatize_sent = deepcopy(in_sent)
+
         lemmatized_sent = \
-            self._lemma_model[self._config.active_lang].predict([{ID: 1, TOKENS: dlemmatize_sent}], obmit_tag)[0][
+            self._lemma_model[self._config.active_lang].predict([{ID: 1, TOKENS: in_sent}], obmit_tag)[0][
                 TOKENS]
+
+        gc.collect()
         return lemmatized_sent
 
     def _lemmatize_doc(self, in_doc, obmit_tag=False):  # assuming input is a document
@@ -929,12 +982,14 @@ class Pipeline:
             in_doc = self._tokenize_doc(in_doc)
             in_doc = self._posdep_doc(in_doc)
 
-        dlemmatize_doc = deepcopy(in_doc)
-        lemmatized_doc = self._lemma_model[self._config.active_lang].predict(dlemmatize_doc, obmit_tag)
+        lemmatized_doc = self._lemma_model[self._config.active_lang].predict(in_doc, obmit_tag)
+
+        gc.collect()
         return lemmatized_doc
 
     def _mwt_expand(self, tokenized_doc):
         expanded_doc = self._mwt_model[self._config.active_lang].predict(tokenized_doc)
+        gc.collect()
         return expanded_doc
 
     def ner(self, input, is_sent=False):
@@ -989,7 +1044,7 @@ class Pipeline:
         if type(in_sent) == str:
             in_sent = self._tokenize_sent(in_sent)
 
-        dner_doc = [{ID: 1, TOKENS: deepcopy(in_sent)}]
+        dner_doc = [{ID: 1, TOKENS: in_sent}]
         sentences = [[t[TEXT] for t in sentence[TOKENS]] for sentence in dner_doc]
         test_set = NERDatasetLive(
             config=self._config,
@@ -1017,14 +1072,17 @@ class Pipeline:
 
                     # NER tag
                     dner_doc[sentid][TOKENS][wordid][NER] = pred_entity_labels[bid][i]
+            
+            del pred_entity_labels
 
         torch.cuda.empty_cache()
+        gc.collect()
         return dner_doc[0][TOKENS]
 
     def _ner_doc(self, in_doc):  # assuming input is a document
         if type(in_doc) == str:
             in_doc = self._tokenize_doc(in_doc)
-        dner_doc = deepcopy(in_doc)
+        dner_doc = in_doc
         sentences = [[t[TEXT] for t in sentence[TOKENS]] for sentence in dner_doc]
         test_set = NERDatasetLive(
             config=self._config,
@@ -1053,7 +1111,10 @@ class Pipeline:
                     # NER tag
                     dner_doc[sentid][TOKENS][wordid][NER] = pred_entity_labels[bid][i]
 
+            del pred_entity_labels
+
         torch.cuda.empty_cache()
+        gc.collect()
         return dner_doc
 
     def __call__(self, input, is_sent=False):
