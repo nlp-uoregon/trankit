@@ -11,10 +11,11 @@ from collections import defaultdict
 from .utils.conll import *
 from .utils.tbinfo import tbname2training_id, lang2treebank
 from .utils.chuliu_edmonds import *
-from .adapter_transformers import XLMRobertaTokenizer
+from adapters.loading import AdapterLoader
 from datetime import datetime
 import langid
 import gc
+from transformers import XLMRobertaTokenizer
 
 
 def is_string(input):
@@ -84,6 +85,8 @@ class Pipeline:
         if self._use_gpu:
             self._embedding_layers.half()
         self._embedding_layers.eval()
+        # for loading & auto-converting adapter weights
+        self._adapter_loader = AdapterLoader(self._embedding_layers.xlmr, "text_task")
 
         # tokenizers
         self._tokenizer = {}
@@ -303,12 +306,9 @@ class Pipeline:
                 assert model_name == 'ner'
                 pretrained_weights = self._ner_model[self._config.active_lang].pretrained_ner_weights
 
-            for name, value in pretrained_weights.items():
-                adapter_name = f'adapters.{model_name}.adapter'
-                if adapter_name in name:
-                    target_name = name.replace(adapter_name, 'adapters.embedding.adapter')
-                    self._embedding_weights[target_name] = value
-            self._embedding_layers.load_state_dict(self._embedding_weights)
+            self._adapter_loader.load_from_state_dict(
+                pretrained_weights, model_name, load_as="embedding", start_prefix="xlmr."
+            )
             # save information of active adapter
             self._config.active_adapter = model_name
 
