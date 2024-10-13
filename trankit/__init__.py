@@ -6,7 +6,7 @@ from .utils.tbinfo import supported_embeddings, supported_langs, saved_model_ver
 import os
 from shutil import copyfile
 
-__version__ = "1.1.0"
+__version__ = "1.1.2"
 
 
 def download_missing_files(category, save_dir, embedding_name, language):
