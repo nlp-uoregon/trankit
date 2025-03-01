@@ -256,12 +256,11 @@ class NERDataset(Dataset):
                                            [0] * (max_word_num - inst.word_num))
             batch_word_mask.append([1] * inst.word_num + [0] * (max_word_num - inst.word_num))
 
-        batch_piece_idxs = torch.cuda.LongTensor(batch_piece_idxs)
-        batch_attention_masks = torch.cuda.FloatTensor(
-            batch_attention_masks)
-        batch_entity_label_idxs = torch.cuda.LongTensor(batch_entity_label_idxs)
-        batch_word_num = torch.cuda.LongTensor(batch_word_num)
-        batch_word_mask = torch.cuda.LongTensor(batch_word_mask).eq(0)
+        batch_piece_idxs = torch.tensor(batch_piece_idxs, dtype=torch.long, device=self.config.device)
+        batch_attention_masks = torch.tensor(batch_attention_masks, dtype=torch.float, device=self.config.device)
+        batch_entity_label_idxs = torch.tensor(batch_entity_label_idxs, dtype=torch.long, device=self.config.device)
+        batch_word_num = torch.tensor(batch_word_num, dtype=torch.long, device=self.config.device)
+        batch_word_mask = torch.tensor(batch_word_mask, dtype=torch.long, device=self.config.device).eq(0)
 
         return Train_Batch(
             words=batch_words,

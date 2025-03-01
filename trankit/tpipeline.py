@@ -1,4 +1,4 @@
-from .config import config as master_config
+from .config import Config as MasterConfig
 from .models.base_models import Multilingual_Embedding
 from .models.classifiers import TokenizerClassifier, PosDepClassifier, NERClassifier
 from .models.mwt_model import MWTWrapper
@@ -12,9 +12,9 @@ from collections import defaultdict
 from .utils.conll import *
 from .utils.tbinfo import tbname2training_id, lang2treebank
 from .utils.chuliu_edmonds import *
-from .adapter_transformers import XLMRobertaTokenizer
 from tqdm import tqdm
-from .adapter_transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import XLMRobertaTokenizer
 import logging
 
 
@@ -121,9 +121,10 @@ class TPipeline:
         torch.cuda.empty_cache()
 
         # set embedding name
-        master_config.embedding_name = 'xlm-roberta-base' if 'embedding' not in training_config else training_config['embedding']
-        assert master_config.embedding_name in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
-            master_config.embedding_name, supported_embeddings)
+        self.master_config = MasterConfig()
+        self.master_config.embedding_name = 'xlm-roberta-base' if 'embedding' not in training_config else training_config['embedding']
+        assert self.master_config.embedding_name in supported_embeddings, '{} has not been supported.\nSupported embeddings: {}'.format(
+            self.master_config.embedding_name, supported_embeddings)
 
         # lang and data
         self._lang = training_config['category'] if 'category' in training_config else 'customized'
@@ -140,8 +141,8 @@ class TPipeline:
         self._train_bio_fpath = training_config['train_bio_fpath'] if 'train_bio_fpath' in training_config else None
         self._dev_bio_fpath = training_config['dev_bio_fpath'] if 'dev_bio_fpath' in training_config else None
 
-        master_config.train_conllu_fpath = self._train_conllu_fpath
-        master_config.dev_conllu_fpath = self._dev_conllu_fpath
+        self.master_config.train_conllu_fpath = self._train_conllu_fpath
+        self.master_config.dev_conllu_fpath = self._dev_conllu_fpath
 
         if self._task == 'tokenize':
             assert self._train_txt_fpath and self._train_conllu_fpath and self._dev_txt_fpath and self._dev_conllu_fpath, 'Missing one of these files: (i) train/dev txt file containing raw text (ii) train/dev conllu file containing annotated labels'
@@ -160,22 +161,22 @@ class TPipeline:
 
         # device and save dir
         self._save_dir = training_config['save_dir'] if 'save_dir' in training_config else './cache/'
-        self._save_dir = os.path.join(self._save_dir, master_config.embedding_name, self._lang)
+        self._save_dir = os.path.join(self._save_dir, self.master_config.embedding_name, self._lang)
         self._cache_dir = self._save_dir
         self._gpu = training_config['gpu'] if 'gpu' in training_config else True
         self._use_gpu = training_config['gpu'] if 'gpu' in training_config else True
         self._ud_eval = True
         if self._gpu and torch.cuda.is_available():
             self._use_gpu = True
-            master_config.device = torch.device('cuda')
+            self.master_config.device = torch.device('cuda')
         else:
             self._use_gpu = False
-            master_config.device = torch.device('cpu')
+            self.master_config.device = torch.device('cpu')
 
-        master_config._save_dir = self._save_dir
-        master_config._cache_dir = self._save_dir
+        self.master_config._save_dir = self._save_dir
+        self.master_config._cache_dir = self._save_dir
         ensure_dir(self._save_dir)
-        self._config = master_config
+        self._config = self.master_config
         self._config.training = True
         self._config.lang = self._lang
         self._config.treebank_name = treebank_name
@@ -210,8 +211,8 @@ class TPipeline:
 
         # wordpiece splitter
         if self._task not in ['mwt', 'lemmatize']:
-            master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(master_config.embedding_name,
-                                                                                   cache_dir=master_config._save_dir)
+            self.master_config.wordpiece_splitter = XLMRobertaTokenizer.from_pretrained(self.master_config.embedding_name,
+                                                                                   cache_dir=self.master_config._save_dir)
 
     def _prepare_tokenize(self):
         self.train_set = TokenizeDataset(
