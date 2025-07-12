@@ -99,9 +99,18 @@ def download(cache_dir, language, saved_model_version, embedding_name):  # put a
         url = "http://nlp.uoregon.edu/download/trankit/{}/{}/{}.zip".format(saved_model_version, embedding_name,
                                                                             language)
         print(url)
-
-        response = requests.get(url, stream=True)
+        try:
+            response = requests.get(url, stream=True)
+        except:
+            url = url.replace("http://", "http://web.archive.org/web/")
+            print(url)
+            response = requests.get(url, stream=True)
         total_size_in_bytes = int(response.headers.get('content-length', 0))
+        if total_size_in_bytes == 0:
+            url = url.replace("/v1.0.0/xlm-roberta-base/", "/")
+            print(url)
+            response = requests.get(url, stream=True)
+            total_size_in_bytes = int(response.headers.get('content-length', 0))
         block_size = 1024
         progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True, desc='Downloading: ')
 
