@@ -51,7 +51,7 @@ We also created a Demo Website for Trankit, which is hosted at: http://nlp.uoreg
 ### Installation
 Trankit can be easily installed via one of the following methods:
 
-**[July 23, 2025: We currently have a problem with our server. Please only install trankit from source for now. It will download the models from: https://huggingface.co/uonlp/trankit/tree/main/models. We will update the install with pip later.]**
+**[July 23, 2025: We currently have a problem with our server. Please only install Trankit from source for now. It will download the models from: https://huggingface.co/uonlp/trankit/tree/main/models. We will update the install with pip later.]**
 #### Using pip
 ```
 pip install trankit
