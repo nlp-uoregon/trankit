@@ -96,7 +96,7 @@ def download(cache_dir, language, saved_model_version, embedding_name):  # put a
     save_fpath = os.path.join(lang_dir, '{}.zip'.format(language))
 
     if not os.path.exists(os.path.join(lang_dir, '{}.downloaded'.format(language))):
-        url = "http://nlp.uoregon.edu/download/trankit/{}/{}/{}.zip".format(saved_model_version, embedding_name,
+        url = "https://huggingface.co/uonlp/trankit/resolve/main/models/{}/{}/{}.zip".format(saved_model_version, embedding_name,
                                                                             language)
         print(url)
 
