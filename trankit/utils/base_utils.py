@@ -102,7 +102,8 @@ def download(cache_dir, language, saved_model_version, embedding_name):  # put a
         try:
             response = requests.get(url, stream=True)
         except:
-            url = url.replace("http://", "http://web.archive.org/web/")
+            url = "http://web.archive.org/web/nlp.uoregon.edu/download/{}/{}/{}.zip".format(saved_model_version, embedding_name,
+                                                                            language)
             print(url)
             response = requests.get(url, stream=True)
         total_size_in_bytes = int(response.headers.get('content-length', 0))
