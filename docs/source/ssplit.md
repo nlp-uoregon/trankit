@@ -15,7 +15,7 @@ sentences = p.ssplit(doc_text)
 
 print(sentences)
 ```
-The output of the sentence segmentation module is a native Python dictionary with a list of the split sentences. For each sentence, we can access its span which is handy for retrieving the sentnece's location in the original document. The output would look like this:
+The output of the sentence segmentation module is a native Python dictionary with a list of the split sentences. For each sentence, we can access its span which is handy for retrieving the sentence's location in the original document. The output would look like this:
 ```python
 {
   'text': 'Hello! This is Trankit.',
