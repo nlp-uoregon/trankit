@@ -12,8 +12,9 @@ from collections import defaultdict
 from .utils.conll import *
 from .utils.tbinfo import tbname2training_id, lang2treebank
 from .utils.chuliu_edmonds import *
+from torch.optim import AdamW
 from tqdm import tqdm
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
 from transformers import XLMRobertaTokenizer
 import logging
 
