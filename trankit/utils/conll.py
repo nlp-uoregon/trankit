@@ -120,9 +120,9 @@ class CoNLL:
         Output: CoNLL-U format data, which is a list of list of list for each token in each sentence in the data.
         """
         doc_conll = []
-        for sent_dict in doc_dict:
+        for sent_dict in doc_dict["sentences"]:
             sent_conll = []
-            for token_dict in sent_dict:
+            for token_dict in sent_dict["tokens"]:
                 token_conll = CoNLL.convert_token_dict(token_dict)
                 sent_conll.append(token_conll)
             doc_conll.append(sent_conll)
